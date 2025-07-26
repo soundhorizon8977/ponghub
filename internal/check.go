@@ -113,6 +113,9 @@ func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) Por
 			log.Printf("FAILED - Error: %s", err.Error())
 			continue
 		}
+		for k, v := range cfg.Headers {
+			req.Header.Set(k, v)
+		}
 		if cfg.Body != "" {
 			req.Body = io.NopCloser(strings.NewReader(cfg.Body))
 		}

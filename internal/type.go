@@ -19,11 +19,12 @@ type (
 
 	// PortConfig defines the configuration for a port
 	PortConfig struct {
-		URL           string `yaml:"url"`
-		Method        string `yaml:"method,omitempty"`
-		Body          string `yaml:"body,omitempty"`
-		StatusCode    int    `yaml:"status_code,omitempty"`
-		ResponseRegex string `yaml:"response_regex,omitempty"`
+		URL           string            `yaml:"url"`
+		Method        string            `yaml:"method,omitempty"`
+		Headers       map[string]string `yaml:"headers,omitempty"`
+		Body          string            `yaml:"body,omitempty"`
+		StatusCode    int               `yaml:"status_code,omitempty"`
+		ResponseRegex string            `yaml:"response_regex,omitempty"`
 	}
 
 	// Config defines the overall configuration structure for the application

@@ -1,6 +1,6 @@
-# [![PongHub](static/band.png)](https://health.ch3nyang.top)
-
 <div align="center">
+
+# [![PongHub](static/band.png)](https://health.ch3nyang.top)
 
 🌏 [Live Demo](https://health.ch3nyang.top) | 📖 [简体中文](README_CN.md)
 
@@ -43,20 +43,20 @@ PongHub is an open-source service status monitoring website designed to help use
 
 The `config.yaml` file follows this format:
 
-| Field                            | Type    | Description                                                         | Required |
-|----------------------------------|---------|---------------------------------------------------------------------|----------|
-| `timeout`                        | Integer | Timeout for each request in seconds                                 | ✖️       |
-| `retry`                          | Integer | Number of retry attempts on request failure                         | ✖️       |
-| `max_log_days`                   | Integer | Number of days to retain logs; logs older than this will be deleted | ✖️       |
-| `services`                       | Array   | List of services to monitor                                         | ✔️       |
-| `services.name`                  | String  | Name of the service                                                 | ✔️       |
-| `services.health`                | Array   | Health check configurations for the service                         | ✖️       |
-| `services.health.url`            | String  | URL to check                                                        | ✔️       |
-| `services.health.method`         | String  | HTTP method (`GET`/`POST`/`PUT`)                                    | ✖️       |
-| `services.health.status_code`    | Integer | Expected HTTP status code (default `200`)                           | ✖️       |
-| `services.health.response_regex` | String  | Regex to match response body content                                | ✖️       |
-| `services.health.body`           | String  | Request body content, used only for `POST` requests                 | ✖️       |
-| `services.api`                   | Array   | API check configurations, same format as above                      | ✖️       |
+| Field                         | Type    | Description                                              | Required | Notes                                         |
+|-------------------------------|---------|----------------------------------------------------------|----------|-----------------------------------------------|
+| `timeout`                     | Integer | Timeout for each request in seconds                      | No       |                                               |
+| `retry`                       | Integer | Number of retries on request failure                     | No       | Default is 2 retries                          |
+| `max_log_days`                | Integer | Number of days to retain logs                            | No       | Default is 30 days                            |
+| `services`                    | Array   | List of services to monitor                              | Yes      |                                               |
+| `services.name`               | String  | Name of the service                                      | Yes      |                                               |
+| `services.api`                | Array   | List of APIs to check for the service                    | Yes      |                                               |                                               |
+| `services.api.url`            | String  | URL to request                                           | Yes      | Supports both HTTP and HTTPS protocols        |
+| `services.api.method`         | String  | HTTP method for the request                              | No       | Supports `GET`/`POST`/`PUT`, default is `GET` |
+| `services.api.headers`        | Object  | Request headers                                          | No       | Key-value                                     |
+| `services.api.body`           | String  | Request body content                                     | No       | Used only for `POST`/`PUT` requests           |
+| `services.api.status_code`    | Integer | Expected HTTP status code in response (default is `200`) | No       | Default is `200`                              |
+| `services.api.response_regex` | String  | Regex to match the response body content                 | No       |                                               |
 
 Here is an example configuration file:
 
@@ -66,24 +66,23 @@ retry: 2
 max_log_days: 30
 services:
   - name: "GitHub API"
-    health:
-      - url: "https://api.github.com"
     api:
+      - url: "https://api.github.com"
       - url: "https://api.github.com/repos/wcy-dt/ponghub"
         method: "GET"
+        headers:
+          Content-Type: application/json
+          Authorization: Bearer your_token
         status_code: 200
         response_regex: "full_name"
   - name: "Ch3nyang's  Websites"
-    health:
+    api:
       - url: "https://example.com/health"
         response_regex: "status"
       - url: "https://example.com/status"
         method: "POST"
         body: '{"key": "value"}'
 ```
-
-> [!NOTE]
-> The `health` and `api` sections must have at least one entry. They are processed similarly, with this distinction made for future expansion.
 
 ## Disclaimer
 

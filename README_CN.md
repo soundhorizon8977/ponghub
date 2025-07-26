@@ -1,6 +1,6 @@
-# [![PongHub](static/band.png)](https://health.ch3nyang.top)
-
 <div align="center">
+
+# [![PongHub](static/band.png)](https://health.ch3nyang.top)
 
 🌏 [Live Demo](https://health.ch3nyang.top) | 📖 [English](README.md)
 
@@ -43,20 +43,20 @@ PongHub 是一个开源的服务状态监控网站，旨在帮助用户监控和
 
 配置文件 `config.yaml` 的格式如下：
 
-| 字段                               | 类型  | 描述                          | 必填 |
-|----------------------------------|-----|-----------------------------|----|
-| `timeout`                        | 整数  | 每次请求的超时时间，单位为秒              | ✖️ |
-| `retry`                          | 整数  | 请求失败时的重试次数                  | ✖️ |
-| `max_log_days`                   | 整数  | 日志保留天数，超过此天数的日志将被删除         | ✖️ |
-| `services`                       | 数组  | 服务列表                        | ✔️ |
-| `services.name`                  | 字符串 | 服务名称                        | ✔️ |
-| `services.health`                | 数组  | 健康检查配置列表                    | ✖️ |
-| `services.health.url`            | 字符串 | 检查的 URL                     | ✔️ |
-| `services.health.method`         | 字符串 | HTTP 方法（`GET`/`POST`/`PUT`） | ✖️ |
-| `services.health.status_code`    | 整数  | 期望的 HTTP 状态码（默认 `200`）      | ✖️ |
-| `services.health.response_regex` | 字符串 | 响应体内容的正则表达式匹配               | ✖️ |
-| `services.health.body`           | 字符串 | 请求体内容，仅在 `POST` 请求时使用       | ✖️ |
-| `services.api`                   | 数组  | API 检查配置列表，格式同上             | ✖️ |
+| 字段                            | 类型  | 描述                        | 必填 | 备注                             |
+|-------------------------------|-----|---------------------------|----|--------------------------------|
+| `timeout`                     | 整数  | 每次请求的超时时间，单位为秒            | ✖️ | 单位为秒，默认 5 秒                    |
+| `retry`                       | 整数  | 请求失败时的重试次数                | ✖️ | 默认 2 次                         |
+| `max_log_days`                | 整数  | 日志保留天数，超过此天数的日志将被删除       | ✖️ | 默认 30 天                        |
+| `services`                    | 数组  | 服务列表                      | ✔️ |                                |
+| `services.name`               | 字符串 | 服务名称                      | ✔️ |                                |
+| `services.api`                | 数组  | API 列表                    | ✔️ |                                |
+| `services.api.url`            | 字符串 | 请求的 URL                   | ✔️ |                                |
+| `services.api.method`         | 字符串 | 请求的 HTTP 方法               | ✖️ | 支持 `GET`/`POST`/`PUT`，默认 `GET` |
+| `services.api.headers`        | 对象  | 请求头内容                     | ✖️ | 键值对形式，支持自定义请求头                 |
+| `services.api.body`           | 字符串 | 请求体内容                     | ✖️ | 仅在 `POST`/`PUT` 请求时使用          |
+| `services.api.status_code`    | 整数  | 响应体期望的 HTTP 状态码（默认 `200`） | ✖️ | 默认 `200`                       |
+| `services.api.response_regex` | 字符串 | 响应体内容的正则表达式匹配             | ✖️ |                                |
 
 下面是一个示例配置文件：
 
@@ -66,24 +66,23 @@ retry: 2
 max_log_days: 30
 services:
   - name: "GitHub API"
-    health:
-      - url: "https://api.github.com"
     api:
+      - url: "https://api.github.com"
       - url: "https://api.github.com/repos/wcy-dt/ponghub"
         method: "GET"
+        headers:
+          Content-Type: application/json
+          Authorization: Bearer your_token
         status_code: 200
         response_regex: "full_name"
   - name: "Ch3nyang's  Websites"
-    health:
+    api:
       - url: "https://example.com/health"
         response_regex: "status"
       - url: "https://example.com/status"
         method: "POST"
         body: '{"key": "value"}'
 ```
-
-> [!NOTE]
-> `health` 和 `api` 至少有一个。这两者在处理上没有区别，是为未来扩展做的预留。
 
 ## 免责声明
 
