@@ -1,4 +1,4 @@
-package portType
+package port_type
 
 type PortType string
 

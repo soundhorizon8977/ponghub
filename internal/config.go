@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/wcy-dt/ponghub/protos/defaultConfig"
+	"github.com/wcy-dt/ponghub/protos/default_config"
 	"log"
 	"os"
 
@@ -36,13 +36,13 @@ type Config struct {
 
 // SetDefaultFields sets default values for the configuration fields
 func SetDefaultFields(cfg *Config) {
-	defaultConfig.SetDefaultTimeout(&cfg.Timeout)
-	defaultConfig.SetDefaultRetry(&cfg.Retry)
-	defaultConfig.SetDefaultMaxLogDays(&cfg.MaxLogDays)
+	default_config.SetDefaultTimeout(&cfg.Timeout)
+	default_config.SetDefaultRetry(&cfg.Retry)
+	default_config.SetDefaultMaxLogDays(&cfg.MaxLogDays)
 
 	for i := range cfg.Services {
-		defaultConfig.SetDefaultTimeout(&cfg.Services[i].Timeout)
-		defaultConfig.SetDefaultRetry(&cfg.Services[i].Retry)
+		default_config.SetDefaultTimeout(&cfg.Services[i].Timeout)
+		default_config.SetDefaultRetry(&cfg.Services[i].Retry)
 	}
 }
 

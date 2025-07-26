@@ -10,35 +10,34 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wcy-dt/ponghub/protos/portType"
-	"github.com/wcy-dt/ponghub/protos/testResult"
+	"github.com/wcy-dt/ponghub/protos/test_result"
 )
 
 // CheckResult defines the structure for the result of checking a service
 type CheckResult struct {
-	Name          string                `json:"name"`
-	Online        testResult.TestResult `json:"online"`
-	Health        []PortResult          `json:"health,omitempty"`
-	API           []PortResult          `json:"api,omitempty"`
-	StartTime     string                `json:"start_time"`
-	EndTime       string                `json:"end_time"`
-	TotalAttempts int                   `json:"total_attempts"`
-	SuccessCount  int                   `json:"success_count"`
+	Name          string                 `json:"name"`
+	Online        test_result.TestResult `json:"online"`
+	Health        []PortResult           `json:"health,omitempty"`
+	API           []PortResult           `json:"api,omitempty"`
+	StartTime     string                 `json:"start_time"`
+	EndTime       string                 `json:"end_time"`
+	TotalAttempts int                    `json:"total_attempts"`
+	SuccessCount  int                    `json:"success_count"`
 }
 
 // PortResult defines the structure for the result of checking a port
 type PortResult struct {
-	URL           string                `json:"url"`
-	Method        string                `json:"method"`
-	Body          string                `json:"body,omitempty"`
-	Online        testResult.TestResult `json:"online"`
-	StatusCode    int                   `json:"status_code,omitempty"`
-	StartTime     string                `json:"start_time"`
-	EndTime       string                `json:"end_time"`
-	TotalAttempts int                   `json:"total_attempts"`
-	SuccessCount  int                   `json:"success_count"`
-	Failures      []string              `json:"failures,omitempty"`
-	ResponseBody  string                `json:"response_body,omitempty"`
+	URL           string                 `json:"url"`
+	Method        string                 `json:"method"`
+	Body          string                 `json:"body,omitempty"`
+	Online        test_result.TestResult `json:"online"`
+	StatusCode    int                    `json:"status_code,omitempty"`
+	StartTime     string                 `json:"start_time"`
+	EndTime       string                 `json:"end_time"`
+	TotalAttempts int                    `json:"total_attempts"`
+	SuccessCount  int                    `json:"success_count"`
+	Failures      []string               `json:"failures,omitempty"`
+	ResponseBody  string                 `json:"response_body,omitempty"`
 }
 
 // getHttpMethod converts a string method to an HTTP method constant
@@ -69,14 +68,14 @@ func getHttpMethod(method string) string {
 }
 
 // getTestResult determines the test result based on the success count and actual attempts
-func getTestResult(successCount, actualAttempts int) testResult.TestResult {
+func getTestResult(successCount, actualAttempts int) test_result.TestResult {
 	switch successCount {
 	case actualAttempts:
-		return testResult.ALL
+		return test_result.ALL
 	case 0:
-		return testResult.NONE
+		return test_result.NONE
 	default:
-		return testResult.PART
+		return test_result.PART
 	}
 }
 
@@ -112,7 +111,7 @@ func isSuccessfulResponse(cfg *PortConfig, resp *http.Response, body []byte) boo
 }
 
 // CheckPort checks a single port based on the provided configuration
-func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string, portType portType.PortType) PortResult {
+func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) PortResult {
 	failures := []string{}
 	successCount := 0
 	actualAttempts := 0
@@ -213,12 +212,12 @@ func CheckServices(cfg *Config) []CheckResult {
 		// check health ports
 		healthResults := []PortResult{}
 		for _, h := range svc.Health {
-			pr := CheckPort(&h, svc.Timeout, svc.Retry, svc.Name, portType.HEALTH)
+			pr := CheckPort(&h, svc.Timeout, svc.Retry, svc.Name)
 			healthResults = append(healthResults, pr)
 			totalAttempts += pr.TotalAttempts
 			successCount += pr.SuccessCount
 			totalPorts++
-			if pr.Online == testResult.ALL {
+			if pr.Online == test_result.ALL {
 				onlinePorts++
 			}
 		}
@@ -226,12 +225,12 @@ func CheckServices(cfg *Config) []CheckResult {
 		// check API ports
 		apiResults := []PortResult{}
 		for _, a := range svc.API {
-			pr := CheckPort(&a, svc.Timeout, svc.Retry, svc.Name, portType.API)
+			pr := CheckPort(&a, svc.Timeout, svc.Retry, svc.Name)
 			apiResults = append(apiResults, pr)
 			totalAttempts += pr.TotalAttempts
 			successCount += pr.SuccessCount
 			totalPorts++
-			if pr.Online == testResult.ALL {
+			if pr.Online == test_result.ALL {
 				onlinePorts++
 			}
 		}

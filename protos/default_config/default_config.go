@@ -1,4 +1,4 @@
-package defaultConfig
+package default_config
 
 const (
 	// timeout is the default timeout for service checks in seconds
@@ -56,6 +56,9 @@ const (
 
 	// reportPath is the default path to the HTML report file
 	reportPath = "data/index.html"
+
+	// templatePath is the default path to the HTML template file
+	templatePath = "templates/report.html"
 )
 
 // GetConfigPath returns the default path to the configuration file
@@ -71,4 +74,9 @@ func GetLogPath() string {
 // GetReportPath returns the default path to the HTML report file
 func GetReportPath() string {
 	return reportPath
+}
+
+// GetTemplatePath returns the default path to the HTML template file
+func GetTemplatePath() string {
+	return templatePath
 }

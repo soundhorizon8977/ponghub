@@ -1,4 +1,4 @@
-package testResult
+package test_result
 
 type TestResult string
 
@@ -33,6 +33,21 @@ func (tr TestResult) String() string {
 // IsValid checks if the TestResult is valid
 func (tr TestResult) IsValid() bool {
 	return tr == ALL || tr == PART || tr == NONE
+}
+
+// IsALL checks if the TestResult is ALL
+func IsALL(resultStr string) bool {
+	return ParseTestResult(resultStr) == ALL
+}
+
+// IsPART checks if the TestResult is PART
+func IsPART(resultStr string) bool {
+	return ParseTestResult(resultStr) == PART
+}
+
+// IsNONE checks if the TestResult is NONE
+func IsNONE(resultStr string) bool {
+	return ParseTestResult(resultStr) == NONE
 }
 
 // ParseTestResult parses a string into a TestResult

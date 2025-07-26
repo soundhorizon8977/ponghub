@@ -7,41 +7,40 @@ import (
 	"os"
 	"time"
 
-	"github.com/wcy-dt/ponghub/protos/defaultConfig"
-	"github.com/wcy-dt/ponghub/protos/testResult"
+	"github.com/wcy-dt/ponghub/protos/test_result"
 )
 
 // MergeOnlineStatus merges a list of online statuses into a single status
-func MergeOnlineStatus(statusList []testResult.TestResult) testResult.TestResult {
+func MergeOnlineStatus(statusList []test_result.TestResult) test_result.TestResult {
 	if len(statusList) == 0 {
-		return testResult.NONE
+		return test_result.NONE
 	}
 
 	hasNone, hasAll := false, false
 	for _, s := range statusList {
 		switch s {
-		case testResult.NONE:
+		case test_result.NONE:
 			hasNone = true
-		case testResult.ALL:
+		case test_result.ALL:
 			hasAll = true
 		}
 	}
 
 	switch {
 	case hasNone && !hasAll:
-		return testResult.NONE
+		return test_result.NONE
 	case !hasNone && hasAll:
-		return testResult.ALL
+		return test_result.ALL
 	default:
-		return testResult.PART
+		return test_result.PART
 	}
 }
 
 // OutputResults writes the check results to a JSON file and updates the log file
-func OutputResults(results []CheckResult, maxLogDays int) error {
+func OutputResults(results []CheckResult, maxLogDays int, logPath string) error {
 	// Get existing log data or create a new map
 	var logData = make(map[string]map[string]any)
-	if b, err := os.ReadFile(defaultConfig.GetLogPath()); err == nil {
+	if b, err := os.ReadFile(logPath); err == nil {
 		if err := json.Unmarshal(b, &logData); err != nil {
 			log.Fatalln("Failed to read existing log file:", err)
 		}
@@ -129,7 +128,7 @@ func OutputResults(results []CheckResult, maxLogDays int) error {
 			}
 		}
 		for url, statusList := range urlStatusMap {
-			mergedStatus := MergeOnlineStatus(testResult.ParseTestResults(statusList))
+			mergedStatus := MergeOnlineStatus(test_result.ParseTestResults(statusList))
 			entry := map[string]string{
 				"time":   urlTimeMap[url],
 				"online": mergedStatus.String(),
@@ -152,7 +151,7 @@ func OutputResults(results []CheckResult, maxLogDays int) error {
 
 	// Write the results to the result file
 	logBytes, _ := json.MarshalIndent(logData, "", "  ")
-	err := os.WriteFile(defaultConfig.GetLogPath(), logBytes, 0644)
+	err := os.WriteFile(logPath, logBytes, 0644)
 	if err != nil {
 		log.Fatalln("Failed to write log file:", err)
 	}

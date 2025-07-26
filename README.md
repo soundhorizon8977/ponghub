@@ -43,20 +43,20 @@ PongHub is an open-source service status monitoring website designed to help use
 
 The `config.yaml` file follows this format:
 
-| Field                     | Type   | Description                                      | Required |
-|---------------------------|--------|--------------------------------------------------|----------|
-| `timeout`                 | Integer| Timeout for each request in seconds              | ✖️       |
-| `retry`                   | Integer| Number of retry attempts on request failure      | ✖️       |
-| `max_log_days`            | Integer| Number of days to retain logs; logs older than this will be deleted | ✖️       |
-| `services`                | Array  | List of services to monitor                      | ✔️      |
-| `services.name`           | String | Name of the service                              | ✔️      |
-| `services.health`         | Array  | Health check configurations for the service      | ✖️       |
-| `services.health.url`     | String | URL to check                                     | ✔️      |
-| `services.health.method`  | String | HTTP method (`GET`/`POST`/`PUT`)                 | ✖️       |
-| `services.health.status_code` | Integer | Expected HTTP status code (default `200`)       | ✖️       |
-| `services.health.response_regex` | String | Regex to match response body content            | ✖️       |
-| `services.health.body`    | String | Request body content, used only for `POST` requests | ✖️       |
-| `services.api`            | Array  | API check configurations, same format as above   | ✖️       |
+| Field                            | Type    | Description                                                         | Required |
+|----------------------------------|---------|---------------------------------------------------------------------|----------|
+| `timeout`                        | Integer | Timeout for each request in seconds                                 | ✖️       |
+| `retry`                          | Integer | Number of retry attempts on request failure                         | ✖️       |
+| `max_log_days`                   | Integer | Number of days to retain logs; logs older than this will be deleted | ✖️       |
+| `services`                       | Array   | List of services to monitor                                         | ✔️       |
+| `services.name`                  | String  | Name of the service                                                 | ✔️       |
+| `services.health`                | Array   | Health check configurations for the service                         | ✖️       |
+| `services.health.url`            | String  | URL to check                                                        | ✔️       |
+| `services.health.method`         | String  | HTTP method (`GET`/`POST`/`PUT`)                                    | ✖️       |
+| `services.health.status_code`    | Integer | Expected HTTP status code (default `200`)                           | ✖️       |
+| `services.health.response_regex` | String  | Regex to match response body content                                | ✖️       |
+| `services.health.body`           | String  | Request body content, used only for `POST` requests                 | ✖️       |
+| `services.api`                   | Array   | API check configurations, same format as above                      | ✖️       |
 
 Here is an example configuration file:
 

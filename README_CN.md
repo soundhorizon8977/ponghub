@@ -43,20 +43,20 @@ PongHub 是一个开源的服务状态监控网站，旨在帮助用户监控和
 
 配置文件 `config.yaml` 的格式如下：
 
-| 字段              | 类型   | 描述                          | 必填 |
-|-----------------|--------|-----------------------------|----|
-| `timeout`       | 整数   | 每次请求的超时时间，单位为秒              | ✖️  |
-| `retry`         | 整数   | 请求失败时的重试次数                  | ✖️  |
-| `max_log_days`  | 整数   | 日志保留天数，超过此天数的日志将被删除         | ✖️  |
-| `services`      | 数组   | 服务列表                        | ✔️  |
-| `services.name` | 字符串 | 服务名称                        | ✔️  |
-| `services.health` | 数组 | 健康检查配置列表                    | ✖️  |
-| `services.health.url` | 字符串 | 检查的 URL                     | ✔️  |
-| `services.health.method` | 字符串 | HTTP 方法（`GET`/`POST`/`PUT`） | ✖️  |
-| `services.health.status_code` | 整数 | 期望的 HTTP 状态码（默认 `200`）        | ✖️  |
-| `services.health.response_regex` | 字符串 | 响应体内容的正则表达式匹配               | ✖️  |
-| `services.health.body` | 字符串 | 请求体内容，仅在 `POST` 请求时使用            | ✖️  |
-| `services.api` | 数组 | API 检查配置列表，格式同上 | ✖️  |
+| 字段                               | 类型  | 描述                          | 必填 |
+|----------------------------------|-----|-----------------------------|----|
+| `timeout`                        | 整数  | 每次请求的超时时间，单位为秒              | ✖️ |
+| `retry`                          | 整数  | 请求失败时的重试次数                  | ✖️ |
+| `max_log_days`                   | 整数  | 日志保留天数，超过此天数的日志将被删除         | ✖️ |
+| `services`                       | 数组  | 服务列表                        | ✔️ |
+| `services.name`                  | 字符串 | 服务名称                        | ✔️ |
+| `services.health`                | 数组  | 健康检查配置列表                    | ✖️ |
+| `services.health.url`            | 字符串 | 检查的 URL                     | ✔️ |
+| `services.health.method`         | 字符串 | HTTP 方法（`GET`/`POST`/`PUT`） | ✖️ |
+| `services.health.status_code`    | 整数  | 期望的 HTTP 状态码（默认 `200`）      | ✖️ |
+| `services.health.response_regex` | 字符串 | 响应体内容的正则表达式匹配               | ✖️ |
+| `services.health.body`           | 字符串 | 请求体内容，仅在 `POST` 请求时使用       | ✖️ |
+| `services.api`                   | 数组  | API 检查配置列表，格式同上             | ✖️ |
 
 下面是一个示例配置文件：
 
