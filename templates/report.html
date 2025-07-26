@@ -55,6 +55,17 @@
                     <span class="status-ball"></span>
                     {{$url}}
                 </div>
+                <div class="port-response-time">
+                    {{/* red > 1000, 100 < yellow <= 1000, green <= 100 */}}
+                    {{ if eq $last.Status "none" }}
+                        <span class="response-time-value response-time-red">-</span>
+                    {{ else }}
+                        <span class="response-time-value
+                            {{ if gt $last.ResponseTime 1000 }}response-time-red{{ else if le $last.ResponseTime 100 }}response-time-green{{ else }}response-time-yellow{{ end }}">
+                            {{ $last.ResponseTime }} ms
+                        </span>
+                    {{ end }}
+                </div>
                 <div class="status-bar">
                     {{ $len := len $arr }}
                     {{ if lt $len 72 }}

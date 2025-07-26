@@ -5,6 +5,7 @@ import (
 	"github.com/wcy-dt/ponghub/protos/test_result"
 	"log"
 	"os"
+	"time"
 )
 
 // MergeOnlineStatus merges multiple statuses into a single status
@@ -61,15 +62,21 @@ func saveLogData(data LogData, logPath string) error {
 }
 
 // processCheckResult processes the check results for a service
-func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, map[string]string) {
+func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, map[string]string, map[string]time.Duration) {
 	urlStatusMap := make(map[string][]test_result.TestResult)
 	urlTimeMap := make(map[string]string)
+	urlResponseTimeMap := make(map[string]time.Duration)
 
 	// Process health checks
 	for _, pr := range svc.Health {
 		urlStatusMap[pr.URL] = append(urlStatusMap[pr.URL], pr.Online)
 		if _, exists := urlTimeMap[pr.URL]; !exists {
 			urlTimeMap[pr.URL] = pr.StartTime
+		}
+		if _, exists := urlResponseTimeMap[pr.URL]; !exists {
+			urlResponseTimeMap[pr.URL] = pr.ResponseTime
+		} else if pr.ResponseTime > urlResponseTimeMap[pr.URL] {
+			urlResponseTimeMap[pr.URL] = pr.ResponseTime
 		}
 	}
 
@@ -79,9 +86,14 @@ func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, m
 		if _, exists := urlTimeMap[pr.URL]; !exists {
 			urlTimeMap[pr.URL] = pr.StartTime
 		}
+		if _, exists := urlResponseTimeMap[pr.URL]; !exists {
+			urlResponseTimeMap[pr.URL] = pr.ResponseTime
+		} else if pr.ResponseTime > urlResponseTimeMap[pr.URL] {
+			urlResponseTimeMap[pr.URL] = pr.ResponseTime
+		}
 	}
 
-	return urlStatusMap, urlTimeMap
+	return urlStatusMap, urlTimeMap, urlResponseTimeMap
 }
 
 // OutputResults writes check results to JSON file
@@ -111,12 +123,13 @@ func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogDa
 		serviceLog.ServiceHistory.CleanExpiredEntries(maxLogDays)
 
 		// Update port statuses
-		urlStatusMap, urlTimeMap := processCheckResult(svc)
+		urlStatusMap, urlTimeMap, urlResponseTimeMap := processCheckResult(svc)
 		for url, statuses := range urlStatusMap {
 			mergedStatus := MergeOnlineStatus(statuses)
 			newEntry := HistoryEntry{
-				Time:   urlTimeMap[url],
-				Status: mergedStatus.String(),
+				Time:         urlTimeMap[url],
+				Status:       mergedStatus.String(),
+				ResponseTime: urlResponseTimeMap[url].Milliseconds(),
 			}
 
 			tmp := serviceLog.PortsData[url]

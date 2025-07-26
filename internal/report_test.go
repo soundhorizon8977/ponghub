@@ -18,6 +18,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// TestGenerateReport tests the GenerateReport function to ensure it generates a report file correctly.
 func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
 	outPath := "data/index.html"

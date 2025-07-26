@@ -37,6 +37,7 @@ func copyLogFile(srcPath, dstPath string) error {
 
 const tmpLogPath = "data/ponghub_log_test.json"
 
+// TestMain_append tests the main functionality when appending to an existing log file.
 func TestMain_append(t *testing.T) {
 	// Change the working directory to the root of the project
 	root, err := filepath.Abs("..")
@@ -79,6 +80,7 @@ func TestMain_append(t *testing.T) {
 	}
 }
 
+// TestMain_new tests the main functionality when creating a new log file.
 func TestMain_new(t *testing.T) {
 	// Change the working directory to the root of the project
 	root, err := filepath.Abs("..")

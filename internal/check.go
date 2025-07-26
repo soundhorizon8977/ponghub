@@ -93,6 +93,7 @@ func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) Por
 	var responseBody string
 
 	httpMethod := getHttpMethod(cfg.Method)
+	responseTime := time.Duration(0)
 
 	// start timer
 	start := time.Now()
@@ -117,7 +118,9 @@ func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) Por
 		}
 
 		// get the response
+		attemptStart := time.Now()
 		resp, err := client.Do(req)
+		attemptDuration := time.Since(attemptStart)
 		if err != nil {
 			failures = append(failures, fmt.Sprintf("StatusCode: N/A, Error: %s", err.Error()))
 			log.Printf("FAILED - Error: %s", err.Error())
@@ -139,10 +142,15 @@ func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) Por
 		isOnline := isSuccessfulResponse(cfg, resp, body)
 		if isOnline {
 			successCount++
+			if attemptDuration > responseTime {
+				responseTime = attemptDuration
+			}
 			responseBody = ""
 			if err := resp.Body.Close(); err != nil {
 				log.Printf("Error closing response body for %s: %v", cfg.URL, err)
 			}
+			log.Printf("SUCCESS - %s %s (attempt %d/%d) - Response Time: %d ms, Status Code: %d",
+				httpMethod, cfg.URL, attemptTimes+1, retryTimes, attemptDuration.Milliseconds(), resp.StatusCode)
 			break
 		}
 		failures = append(failures, fmt.Sprintf("StatusCode or ResponseRegex mismatch: %d", resp.StatusCode))
@@ -163,6 +171,7 @@ func CheckPort(cfg *PortConfig, timeout int, retryTimes int, svcName string) Por
 		StatusCode:    statusCode,
 		StartTime:     start.Format(time.RFC3339),
 		EndTime:       end.Format(time.RFC3339),
+		ResponseTime:  responseTime,
 		TotalAttempts: actualAttempts,
 		SuccessCount:  successCount,
 		Failures:      failures,

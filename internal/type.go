@@ -58,6 +58,7 @@ type (
 		StatusCode    int                    `json:"status_code,omitempty"`
 		StartTime     string                 `json:"start_time"`
 		EndTime       string                 `json:"end_time"`
+		ResponseTime  time.Duration          `json:"response_time"`
 		TotalAttempts int                    `json:"total_attempts"`
 		SuccessCount  int                    `json:"success_count"`
 		Failures      []string               `json:"failures,omitempty"`
@@ -69,9 +70,9 @@ type (
 type (
 	// HistoryEntry represents a single history entry
 	HistoryEntry struct {
-		Time   string `json:"time"`
-		Status string `json:"online"`
-		URL    string `json:"url,omitempty"`
+		Time         string `json:"time"`
+		Status       string `json:"online"`
+		ResponseTime int64  `json:"response_time,omitempty"`
 	}
 
 	HistoryEntryList []HistoryEntry
