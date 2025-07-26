@@ -22,7 +22,12 @@ func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
 	outPath := "data/index.html"
 
-	err := GenerateReport(logPath, outPath)
+	logData, err := loadExistingLog(logPath)
+	if err != nil {
+		t.Fatalf("Failed to load log data: %v", err)
+	}
+
+	err = GenerateReport(logData, outPath)
 	if err != nil {
 		t.Fatalf("GenerateReport failed: %v", err)
 	}

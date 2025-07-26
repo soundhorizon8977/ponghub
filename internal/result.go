@@ -2,22 +2,19 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/wcy-dt/ponghub/protos/test_result"
 	"log"
 	"os"
-	"time"
-
-	"github.com/wcy-dt/ponghub/protos/test_result"
 )
 
-// MergeOnlineStatus merges a list of online statuses into a single status
-func MergeOnlineStatus(statusList []test_result.TestResult) test_result.TestResult {
-	if len(statusList) == 0 {
+// MergeOnlineStatus merges multiple statuses into a single status
+func MergeOnlineStatus(statuses []test_result.TestResult) test_result.TestResult {
+	if len(statuses) == 0 {
 		return test_result.NONE
 	}
 
 	hasNone, hasAll := false, false
-	for _, s := range statusList {
+	for _, s := range statuses {
 		switch s {
 		case test_result.NONE:
 			hasNone = true
@@ -36,124 +33,106 @@ func MergeOnlineStatus(statusList []test_result.TestResult) test_result.TestResu
 	}
 }
 
-// OutputResults writes the check results to a JSON file and updates the log file
-func OutputResults(results []CheckResult, maxLogDays int, logPath string) error {
-	// Get existing log data or create a new map
-	var logData = make(map[string]map[string]any)
-	if b, err := os.ReadFile(logPath); err == nil {
-		if err := json.Unmarshal(b, &logData); err != nil {
-			log.Fatalln("Failed to read existing log file:", err)
+// loadExistingLog loads log data from file or returns empty data
+func loadExistingLog(logPath string) (LogData, error) {
+	data := make(LogData)
+
+	content, err := os.ReadFile(logPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return nil, err
+		}
+		return data, nil
+	}
+
+	if err := json.Unmarshal(content, &data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// saveLogData writes log data to file
+func saveLogData(data LogData, logPath string) error {
+	content, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(logPath, content, 0644)
+}
+
+// processCheckResult processes the check results for a service
+func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, map[string]string) {
+	urlStatusMap := make(map[string][]test_result.TestResult)
+	urlTimeMap := make(map[string]string)
+
+	// Process health checks
+	for _, pr := range svc.Health {
+		urlStatusMap[pr.URL] = append(urlStatusMap[pr.URL], pr.Online)
+		if _, exists := urlTimeMap[pr.URL]; !exists {
+			urlTimeMap[pr.URL] = pr.StartTime
 		}
 	}
 
-	// last update time
-	now := time.Now()
+	// Process API checks
+	for _, pr := range svc.API {
+		urlStatusMap[pr.URL] = append(urlStatusMap[pr.URL], pr.Online)
+		if _, exists := urlTimeMap[pr.URL]; !exists {
+			urlTimeMap[pr.URL] = pr.StartTime
+		}
+	}
+
+	return urlStatusMap, urlTimeMap
+}
+
+// OutputResults writes check results to JSON file
+func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogData, error) {
+	logData, err := loadExistingLog(logPath)
+	if err != nil {
+		log.Printf("Error loading log data from %s: %v", logPath, err)
+		return nil, err
+	}
 
 	for _, svc := range results {
-		// check if service already exists in logData, otherwise initialize it
-		if _, ok := logData[svc.Name]; !ok {
-			logData[svc.Name] = map[string]any{
-				"service_history": []any{},
-				"ports":           map[string][]any{},
+		serviceName := svc.Name
+		serviceLog, exists := logData[serviceName]
+		if !exists {
+			serviceLog = LogEntry{
+				ServiceHistory: HistoryEntryList{},
+				PortsData:      make(PortHistory),
 			}
 		}
 
-		// Handle service_history type
-		svcHistoryRaw := logData[svc.Name]["service_history"]
-		var svcHistory []map[string]string
-		switch v := svcHistoryRaw.(type) {
-		case []any:
-			for _, item := range v {
-				if m, ok := item.(map[string]any); ok {
-					entry := map[string]string{}
-					for k, val := range m {
-						entry[k] = fmt.Sprintf("%v", val)
-					}
-					svcHistory = append(svcHistory, entry)
-				}
-			}
-		case []map[string]string:
-			svcHistory = v
+		// Update service history
+		newHistoryEntry := HistoryEntry{
+			Time:   svc.StartTime,
+			Status: svc.Online.String(),
 		}
-		svcHistory = append(svcHistory, map[string]string{
-			"time":   svc.StartTime,
-			"online": svc.Online.String(),
-		})
-		// Clean up timeout records
-		var filteredSvcHistory []map[string]string
-		for _, entry := range svcHistory {
-			t, err := time.Parse(time.RFC3339, entry["time"])
-			if err == nil && now.Sub(t).Hours() <= float64(maxLogDays*24) {
-				filteredSvcHistory = append(filteredSvcHistory, entry)
-			}
-		}
-		logData[svc.Name]["service_history"] = filteredSvcHistory
+		serviceLog.ServiceHistory.AddEntry(newHistoryEntry)
+		serviceLog.ServiceHistory.CleanExpiredEntries(maxLogDays)
 
-		// Handle ports type
-		portsRaw := logData[svc.Name]["ports"]
-		portsMap := map[string][]map[string]string{}
-		switch v := portsRaw.(type) {
-		case map[string]any:
-			for url, arr := range v {
-				var portHistory []map[string]string
-				if arrList, ok := arr.([]any); ok {
-					for _, item := range arrList {
-						if m, ok := item.(map[string]any); ok {
-							entry := map[string]string{}
-							for k, val := range m {
-								entry[k] = fmt.Sprintf("%v", val)
-							}
-							portHistory = append(portHistory, entry)
-						}
-					}
-				}
-				portsMap[url] = portHistory
+		// Update port statuses
+		urlStatusMap, urlTimeMap := processCheckResult(svc)
+		for url, statuses := range urlStatusMap {
+			mergedStatus := MergeOnlineStatus(statuses)
+			newEntry := HistoryEntry{
+				Time:   urlTimeMap[url],
+				Status: mergedStatus.String(),
 			}
-		case map[string][]map[string]string:
-			portsMap = v
+
+			tmp := serviceLog.PortsData[url]
+			tmp.AddEntry(newEntry)
+			tmp.CleanExpiredEntries(maxLogDays)
+			serviceLog.PortsData[url] = tmp
 		}
-		// Only record one port entry for each unique URL per complete run
-		urlStatusMap := map[string][]string{}
-		urlTimeMap := map[string]string{}
-		for _, pr := range svc.Health {
-			urlStatusMap[pr.URL] = append(urlStatusMap[pr.URL], pr.Online.String())
-			if urlTimeMap[pr.URL] == "" {
-				urlTimeMap[pr.URL] = pr.StartTime
-			}
-		}
-		for _, pr := range svc.API {
-			urlStatusMap[pr.URL] = append(urlStatusMap[pr.URL], pr.Online.String())
-			if urlTimeMap[pr.URL] == "" {
-				urlTimeMap[pr.URL] = pr.StartTime
-			}
-		}
-		for url, statusList := range urlStatusMap {
-			mergedStatus := MergeOnlineStatus(test_result.ParseTestResults(statusList))
-			entry := map[string]string{
-				"time":   urlTimeMap[url],
-				"online": mergedStatus.String(),
-			}
-			portsMap[url] = append(portsMap[url], entry)
-		}
-		// Clean up expired port records
-		for url, history := range portsMap {
-			var filteredPortHistory []map[string]string
-			for _, entry := range history {
-				t, err := time.Parse(time.RFC3339, entry["time"])
-				if err == nil && now.Sub(t).Hours() <= float64(maxLogDays*24) {
-					filteredPortHistory = append(filteredPortHistory, entry)
-				}
-			}
-			portsMap[url] = filteredPortHistory
-		}
-		logData[svc.Name]["ports"] = portsMap
+
+		logData[serviceName] = serviceLog
 	}
 
-	// Write the results to the result file
-	logBytes, _ := json.MarshalIndent(logData, "", "  ")
-	err := os.WriteFile(logPath, logBytes, 0644)
+	err = saveLogData(logData, logPath)
 	if err != nil {
-		log.Fatalln("Failed to write log file:", err)
+		log.Printf("Error saving log data to %s: %v", logPath, err)
+		return nil, err
 	}
-	return nil
+
+	return logData, nil
 }

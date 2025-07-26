@@ -13,33 +13,6 @@ import (
 	"github.com/wcy-dt/ponghub/protos/test_result"
 )
 
-// CheckResult defines the structure for the result of checking a service
-type CheckResult struct {
-	Name          string                 `json:"name"`
-	Online        test_result.TestResult `json:"online"`
-	Health        []PortResult           `json:"health,omitempty"`
-	API           []PortResult           `json:"api,omitempty"`
-	StartTime     string                 `json:"start_time"`
-	EndTime       string                 `json:"end_time"`
-	TotalAttempts int                    `json:"total_attempts"`
-	SuccessCount  int                    `json:"success_count"`
-}
-
-// PortResult defines the structure for the result of checking a port
-type PortResult struct {
-	URL           string                 `json:"url"`
-	Method        string                 `json:"method"`
-	Body          string                 `json:"body,omitempty"`
-	Online        test_result.TestResult `json:"online"`
-	StatusCode    int                    `json:"status_code,omitempty"`
-	StartTime     string                 `json:"start_time"`
-	EndTime       string                 `json:"end_time"`
-	TotalAttempts int                    `json:"total_attempts"`
-	SuccessCount  int                    `json:"success_count"`
-	Failures      []string               `json:"failures,omitempty"`
-	ResponseBody  string                 `json:"response_body,omitempty"`
-}
-
 // getHttpMethod converts a string method to an HTTP method constant
 func getHttpMethod(method string) string {
 	switch strings.ToUpper(method) {

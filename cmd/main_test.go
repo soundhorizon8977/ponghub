@@ -61,12 +61,13 @@ func TestMain_append(t *testing.T) {
 
 	// check services based on the configuration
 	results := ponghub.CheckServices(cfg)
-	if err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath); err != nil {
+	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	if err != nil {
 		log.Fatalln("Error outputting results:", err)
 	}
 
 	// generate the report based on the results
-	if err := ponghub.GenerateReport(tmpLogPath, default_config.GetReportPath()); err != nil {
+	if err := ponghub.GenerateReport(logData, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -96,14 +97,20 @@ func TestMain_new(t *testing.T) {
 
 	// check services based on the configuration
 	results := ponghub.CheckServices(cfg)
-	if err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath); err != nil {
+	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	if err != nil {
 		log.Fatalln("Error outputting results:", err)
 	}
 
 	// generate the report based on the results
-	if err := ponghub.GenerateReport(tmpLogPath, default_config.GetReportPath()); err != nil {
+	if err := ponghub.GenerateReport(logData, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
+	}
+
+	// Remove the temporary log file after tests
+	if err := os.Remove(tmpLogPath); err != nil {
+		log.Println("Error removing temporary log file:", err)
 	}
 }

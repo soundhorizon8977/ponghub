@@ -8,32 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ServiceConfig defines the configuration for a service, including its health and API ports
-type ServiceConfig struct {
-	Name    string       `yaml:"name"`
-	Health  []PortConfig `yaml:"health"`
-	API     []PortConfig `yaml:"api"`
-	Timeout int          `yaml:"timeout,omitempty"`
-	Retry   int          `yaml:"retry,omitempty"`
-}
-
-// PortConfig defines the configuration for a port
-type PortConfig struct {
-	URL           string `yaml:"url"`
-	Method        string `yaml:"method,omitempty"`
-	Body          string `yaml:"body,omitempty"`
-	StatusCode    int    `yaml:"status_code,omitempty"`
-	ResponseRegex string `yaml:"response_regex,omitempty"`
-}
-
-// Config defines the overall configuration structure for the application
-type Config struct {
-	Services   []ServiceConfig `yaml:"services"`
-	Timeout    int             `yaml:"timeout,omitempty"`
-	Retry      int             `yaml:"retry,omitempty"`
-	MaxLogDays int             `yaml:"max_log_days,omitempty"`
-}
-
 // SetDefaultFields sets default values for the configuration fields
 func SetDefaultFields(cfg *Config) {
 	default_config.SetDefaultTimeout(&cfg.Timeout)
