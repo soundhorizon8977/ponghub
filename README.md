@@ -45,18 +45,18 @@ The `config.yaml` file follows this format:
 
 | Field                         | Type    | Description                                              | Required | Notes                                         |
 |-------------------------------|---------|----------------------------------------------------------|----------|-----------------------------------------------|
-| `timeout`                     | Integer | Timeout for each request in seconds                      | No       |                                               |
-| `retry`                       | Integer | Number of retries on request failure                     | No       | Default is 2 retries                          |
-| `max_log_days`                | Integer | Number of days to retain logs                            | No       | Default is 30 days                            |
-| `services`                    | Array   | List of services to monitor                              | Yes      |                                               |
-| `services.name`               | String  | Name of the service                                      | Yes      |                                               |
-| `services.api`                | Array   | List of APIs to check for the service                    | Yes      |                                               |                                               |
-| `services.api.url`            | String  | URL to request                                           | Yes      | Supports both HTTP and HTTPS protocols        |
-| `services.api.method`         | String  | HTTP method for the request                              | No       | Supports `GET`/`POST`/`PUT`, default is `GET` |
-| `services.api.headers`        | Object  | Request headers                                          | No       | Key-value                                     |
-| `services.api.body`           | String  | Request body content                                     | No       | Used only for `POST`/`PUT` requests           |
-| `services.api.status_code`    | Integer | Expected HTTP status code in response (default is `200`) | No       | Default is `200`                              |
-| `services.api.response_regex` | String  | Regex to match the response body content                 | No       |                                               |
+| `timeout`                     | Integer | Timeout for each request in seconds                      | ✖️       | Units are seconds, default is 5 seconds       |
+| `retry`                       | Integer | Number of retries on request failure                     | ✖️       | Default is 2 retries                          |
+| `max_log_days`                | Integer | Number of days to retain logs                            | ✖️       | Default is 30 days                            |
+| `services`                    | Array   | List of services to monitor                              | ✔️       |                                               |
+| `services.name`               | String  | Name of the service                                      | ✔️       |                                               |
+| `services.api`                | Array   | List of APIs to check for the service                    | ✔️       |                                               |                                               |
+| `services.api.url`            | String  | URL to request                                           | ✔️       | Supports both HTTP and HTTPS protocols        |
+| `services.api.method`         | String  | HTTP method for the request                              | ✖️       | Supports `GET`/`POST`/`PUT`, default is `GET` |
+| `services.api.headers`        | Object  | Request headers                                          | ✖️       | Key-value                                     |
+| `services.api.body`           | String  | Request body content                                     | ✖️       | Used only for `POST`/`PUT` requests           |
+| `services.api.status_code`    | Integer | Expected HTTP status code in response (default is `200`) | ✖️       | Default is `200`                              |
+| `services.api.response_regex` | String  | Regex to match the response body content                 | ✖️       |                                               |
 
 Here is an example configuration file:
 
@@ -82,6 +82,14 @@ services:
       - url: "https://example.com/status"
         method: "POST"
         body: '{"key": "value"}'
+```
+
+## Development
+
+This project uses Makefile for local development and testing. You can run the project locally with the following command:
+
+```bash
+make run
 ```
 
 ## Disclaimer

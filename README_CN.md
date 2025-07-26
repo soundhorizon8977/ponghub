@@ -84,6 +84,14 @@ services:
         body: '{"key": "value"}'
 ```
 
+## 本地开发
+
+本项目使用 Makefile 进行本地开发和测试。你可以使用以下命令在本地运行项目：
+
+```bash
+make run
+```
+
 ## 免责声明
 
 [PongHub](https://github.com/WCY-dt/ponghub) 仅用于个人学习和研究，不对程序的使用行为或结果负责。请勿将其用于商业用途或非法活动。
