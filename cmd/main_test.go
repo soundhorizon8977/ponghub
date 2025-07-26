@@ -10,44 +10,8 @@ import (
 	"testing"
 )
 
-func copyLogFile(srcPath, dstPath string) error {
-	srcFile, err := os.Open(srcPath)
-	if err != nil {
-		return err
-	}
-	defer func(srcFile *os.File) {
-		if err := srcFile.Close(); err != nil {
-			log.Println("Error closing source file:", err)
-		}
-	}(srcFile)
-
-	dstFile, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer func(dstFile *os.File) {
-		if err := dstFile.Close(); err != nil {
-			log.Println("Error closing destination file:", err)
-		}
-	}(dstFile)
-
-	_, err = io.Copy(dstFile, srcFile)
-	return err
-}
-
-const tmpLogPath = "data/ponghub_log_test.json"
-
 // TestMain_append tests the main functionality when appending to an existing log file.
 func TestMain_append(t *testing.T) {
-	// Change the working directory to the root of the project
-	root, err := filepath.Abs("..")
-	if err != nil {
-		panic(err)
-	}
-	if err := os.Chdir(root); err != nil {
-		panic(err)
-	}
-
 	// load the default configuration
 	cfg, err := ponghub.LoadConfig(default_config.GetConfigPath())
 	if err != nil {
@@ -82,15 +46,6 @@ func TestMain_append(t *testing.T) {
 
 // TestMain_new tests the main functionality when creating a new log file.
 func TestMain_new(t *testing.T) {
-	// Change the working directory to the root of the project
-	root, err := filepath.Abs("..")
-	if err != nil {
-		panic(err)
-	}
-	if err := os.Chdir(root); err != nil {
-		panic(err)
-	}
-
 	// load the default configuration
 	cfg, err := ponghub.LoadConfig(default_config.GetConfigPath())
 	if err != nil {
@@ -115,4 +70,45 @@ func TestMain_new(t *testing.T) {
 	if err := os.Remove(tmpLogPath); err != nil {
 		log.Println("Error removing temporary log file:", err)
 	}
+}
+
+// copyLogFile copies the log file from srcPath to dstPath.
+func copyLogFile(srcPath, dstPath string) error {
+	srcFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer func(srcFile *os.File) {
+		if err := srcFile.Close(); err != nil {
+			log.Println("Error closing source file:", err)
+		}
+	}(srcFile)
+
+	dstFile, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer func(dstFile *os.File) {
+		if err := dstFile.Close(); err != nil {
+			log.Println("Error closing destination file:", err)
+		}
+	}(dstFile)
+
+	_, err = io.Copy(dstFile, srcFile)
+	return err
+}
+
+// tmpLogPath is a temporary log file path used for testing purposes.
+const tmpLogPath = "data/ponghub_log_test.json"
+
+func TestMain(m *testing.M) {
+	// Change the working directory to the root of the project
+	root, err := filepath.Abs("..")
+	if err != nil {
+		panic(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		panic(err)
+	}
+	os.Exit(m.Run())
 }

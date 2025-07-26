@@ -97,6 +97,7 @@ type (
 	}
 )
 
+// CleanExpiredEntries removes entries older than maxDays from the history entry list.
 func (hel *HistoryEntryList) CleanExpiredEntries(maxDays int) {
 	if maxDays <= 0 {
 		log.Println("Max days for cleaning history is not set or invalid, skipping cleaning.")
@@ -120,10 +121,12 @@ func (hel *HistoryEntryList) CleanExpiredEntries(maxDays int) {
 	*hel = cleanedHistory
 }
 
+// AddEntry adds a new entry to the history entry list.
 func (hel *HistoryEntryList) AddEntry(entry HistoryEntry) {
 	*hel = append(*hel, entry)
 }
 
+// ParseToReportEntries converts LogData to a slice of ReportEntry, calculating availability for each service.
 func (ld LogData) ParseToReportEntries() []ReportEntry {
 	var reportEntries []ReportEntry
 	for svcName, svcData := range ld {

@@ -6,18 +6,6 @@ import (
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	// Change the working directory to the root of the project
-	root, err := filepath.Abs("..")
-	if err != nil {
-		panic(err)
-	}
-	if err := os.Chdir(root); err != nil {
-		panic(err)
-	}
-	os.Exit(m.Run())
-}
-
 // TestGenerateReport tests the GenerateReport function to ensure it generates a report file correctly.
 func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
@@ -44,4 +32,16 @@ func TestGenerateReport(t *testing.T) {
 	if len(f) == 0 {
 		t.Error("Generated report is empty")
 	}
+}
+
+func TestMain(m *testing.M) {
+	// Change the working directory to the root of the project
+	root, err := filepath.Abs("..")
+	if err != nil {
+		panic(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		panic(err)
+	}
+	os.Exit(m.Run())
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// getLatestTime retrieves the latest time from the log data
 func getLatestTime(logData LogData) string {
 	var latestTime string
 
