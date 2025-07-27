@@ -76,10 +76,7 @@
                         </span>
                     {{ end }}
                 </div>
-                <span class="toggle-status-bar-btn btn-hide" onclick="toggleStatusBar(this)">
-                    <svg class="triangle-icon" width="1em" height="1em" viewBox="0 0 24 24"><polygon points="2,10 22,10 12,22"/></svg>
-                </span>
-                <div class="status-bar port-status-bar status-summary">
+                <div class="status-bar port-status-bar">
                     {{ $len := len $arr }}
                     {{ if lt $len 72 }}
                         {{ $missing := sub 72 $len }}
@@ -109,22 +106,6 @@
         {{end}}
     </div>
 </body>
-<script>
-function toggleStatusBar(btn) {
-    const portBlock = btn.closest('.port-block');
-    const statusBar = portBlock.querySelector('.port-status-bar');
-    const triangle = btn.querySelector('.triangle-icon');
-    if (btn.classList.contains('btn-hide')) {
-        statusBar.classList.remove('status-summary');
-        btn.classList.remove('btn-hide');
-        triangle.style.transform = 'rotate(180deg) translateY(-0.3em)';
-    } else {
-        statusBar.classList.add('status-summary');
-        btn.classList.add('btn-hide');
-        triangle.style.transform = 'rotate(0deg) translateY(0)';
-    }
-}
-</script>
 <footer class="footer">
     Want to build your own service monitoring site?<br>
     <a href="https://github.com/WCY-dt/ponghub" target="_blank" rel="noopener" class="footer-link">Visit the GitHub repo</a> and join us!
