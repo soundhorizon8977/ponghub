@@ -16,6 +16,8 @@ PongHub is an open-source service status monitoring website designed to help use
 - **🔍 Multi-port Detection** - Monitor multiple ports for a single service
 - **🤖 Intelligent Response Validation** - Precise matching of status codes and regex validation of response bodies
 - **🛠️ Custom Request Engine** - Flexible configuration of request headers/bodies, timeouts, and retry strategies
+- **📊 Real-time Status Display** - Intuitive service response time and status records
+- **⚠️ Exception Alert Notifications** - Exception alert notifications using GitHub Actions
 
 ![Browser Screenshot](static/browser.png)
 
@@ -38,6 +40,8 @@ PongHub is an open-source service status monitoring website designed to help use
 
 > [!IMPORTANT]
 > If GitHub Actions does not trigger automatically, you can manually trigger it once.
+> 
+> Please ensure that GitHub Pages is enabled and that you have granted notification permissions for GitHub Actions.
 
 ## Configuration Guide
 

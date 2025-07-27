@@ -59,6 +59,9 @@ const (
 
 	// templatePath is the default path to the HTML template file
 	templatePath = "templates/report.html"
+
+	// notifyPath is the default path to the notification template file
+	notifyPath = "data/notify.txt"
 )
 
 // GetConfigPath returns the default path to the configuration file
@@ -79,4 +82,9 @@ func GetReportPath() string {
 // GetTemplatePath returns the default path to the HTML template file
 func GetTemplatePath() string {
 	return templatePath
+}
+
+// GetNotifyPath returns the default path to the notification template file
+func GetNotifyPath() string {
+	return notifyPath
 }

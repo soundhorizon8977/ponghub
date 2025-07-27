@@ -26,6 +26,7 @@ func TestMain_append(t *testing.T) {
 
 	// check services based on the configuration
 	results := ponghub.CheckServices(cfg)
+	ponghub.NotifyResults(results)
 	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)
@@ -54,6 +55,7 @@ func TestMain_new(t *testing.T) {
 
 	// check services based on the configuration
 	results := ponghub.CheckServices(cfg)
+	ponghub.NotifyResults(results)
 	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)

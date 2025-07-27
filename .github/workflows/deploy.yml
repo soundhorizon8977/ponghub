@@ -51,3 +51,13 @@ jobs:
           folder: publish
           git-config-name: github-pages-deploy-action
           git-config-email: noreply@github.com
+
+      - name: "⚠️ Notify Unavailable Services"
+        run: |
+          if [ -f data/notify.txt ] && [ -s data/notify.txt ]; then
+            echo "Unavailable services found:"
+            cat data/notify.txt
+            exit 1
+          else
+            echo "No unavailable services."
+          fi

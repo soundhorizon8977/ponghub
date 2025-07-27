@@ -16,6 +16,7 @@ func main() {
 
 	// check services based on the configuration
 	results := ponghub.CheckServices(cfg)
+	ponghub.NotifyResults(results)
 	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, default_config.GetLogPath())
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)
