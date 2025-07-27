@@ -8,7 +8,7 @@ const (
 	retry = 2
 
 	// maxLogDays is the default maximum number of days to keep logs
-	maxLogDays = 30
+	maxLogDays = 3
 )
 
 // GetDefaultTimeout returns the default timeout for service checks

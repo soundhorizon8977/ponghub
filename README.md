@@ -47,7 +47,7 @@ The `config.yaml` file follows this format:
 |-------------------------------|---------|----------------------------------------------------------|----------|-----------------------------------------------|
 | `timeout`                     | Integer | Timeout for each request in seconds                      | ✖️       | Units are seconds, default is 5 seconds       |
 | `retry`                       | Integer | Number of retries on request failure                     | ✖️       | Default is 2 retries                          |
-| `max_log_days`                | Integer | Number of days to retain logs                            | ✖️       | Default is 30 days                            |
+| `max_log_days`                | Integer | Number of days to retain logs                            | ✖️       | Default is 3 days                             |
 | `services`                    | Array   | List of services to monitor                              | ✔️       |                                               |
 | `services.name`               | String  | Name of the service                                      | ✔️       |                                               |
 | `services.api`                | Array   | List of APIs to check for the service                    | ✔️       |                                               |                                               |
@@ -63,7 +63,7 @@ Here is an example configuration file:
 ```yaml
 timeout: 5
 retry: 2
-max_log_days: 30
+max_log_days: 3
 services:
   - name: "GitHub API"
     api:
