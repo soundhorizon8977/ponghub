@@ -38,12 +38,22 @@
                     {{ if lt $len 72 }}
                     {{ $missing := sub 72 $len }}
                     {{ range $i := until $missing }}
-                    <div class="status-rect status-unknown" title="No Result" data-time="No Data"></div>
+                    <div class="status-rect status-unknown" title="No Result" data-time="No Data">
+                        <div class="status-rect-content" style="height: 100%;"></div>
+                    </div>
                     {{ end }}
                     {{ end }}
                     {{ range $i, $h := .History }}
                     {{ if ge $i (sub $len 72) }}
-                    <div class="status-rect status-{{ $h.Status }}" title="{{ $h.Time }}: {{ $h.Status }}" data-time="{{ $h.Time }}"></div>
+                    <div class="status-rect status-{{ $h.Status }}" title="{{ $h.Time }}: {{ $h.Status }}" data-time="{{ $h.Time }}">
+                        {{ if or (not $h.ResponseTime) (ge $h.ResponseTime 1000) }}
+                        <div class="status-rect-content" style="height: 100%;"></div>
+                        {{ else if le $h.ResponseTime 100 }}
+                        <div class="status-rect-content" style="height: 10%;"></div>
+                        {{ else }}
+                        <div class="status-rect-content" style="height: {{ div $h.ResponseTime 10 }}%;"></div>
+                        {{ end }}
+                    </div>
                     {{ end }}
                     {{ end }}
                 </div>
@@ -57,7 +67,7 @@
                 </div>
                 <div class="port-response-time">
                     {{/* red > 1000, 100 < yellow <= 1000, green <= 100 */}}
-                    {{ if eq $last.Status "none" }}
+                    {{ if or (not $last.ResponseTime) (eq $last.Status "none") }}
                         <span class="response-time-value response-time-red">-</span>
                     {{ else }}
                         <span class="response-time-value
@@ -71,12 +81,22 @@
                     {{ if lt $len 72 }}
                         {{ $missing := sub 72 $len }}
                         {{ range $i := until $missing }}
-                            <div class="status-rect status-unknown" title="No Result" data-time="No Data"></div>
+                            <div class="status-rect status-unknown" title="No Result" data-time="No Data">
+                                <div class="status-rect-content" style="height: 100%;"></div>
+                            </div>
                         {{ end }}
                     {{ end }}
                     {{ range $i, $h := $arr }}
                         {{ if ge $i (sub $len 72) }}
-                            <div class="status-rect status-{{ $h.Status }}" data-time="{{ $h.Time }}"></div>
+                            <div class="status-rect status-{{ $h.Status }}" data-time="{{ $h.Time }}">
+                                {{ if or (not $h.ResponseTime) (ge $h.ResponseTime 1000) }}
+                                    <div class="status-rect-content" style="height: 100%;"></div>
+                                {{ else if le $h.ResponseTime 100 }}
+                                    <div class="status-rect-content" style="height: 10%;"></div>
+                                {{ else }}
+                                    <div class="status-rect-content" style="height: {{ div $h.ResponseTime 10 }}%;"></div>
+                                {{ end }}
+                            </div>
                         {{ end }}
                     {{ end }}
                 </div>

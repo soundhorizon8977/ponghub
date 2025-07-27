@@ -129,7 +129,7 @@ func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogDa
 			newEntry := HistoryEntry{
 				Time:         urlTimeMap[url],
 				Status:       mergedStatus.String(),
-				ResponseTime: urlResponseTimeMap[url].Milliseconds(),
+				ResponseTime: int(urlResponseTimeMap[url].Milliseconds()),
 			}
 
 			tmp := serviceLog.PortsData[url]

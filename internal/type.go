@@ -73,7 +73,7 @@ type (
 	HistoryEntry struct {
 		Time         string `json:"time"`
 		Status       string `json:"online"`
-		ResponseTime int64  `json:"response_time,omitempty"`
+		ResponseTime int    `json:"response_time,omitempty"`
 	}
 
 	HistoryEntryList []HistoryEntry

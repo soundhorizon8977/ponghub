@@ -61,11 +61,11 @@ func createTemplateFunc() template.FuncMap {
 		"add": func(a, b int) int { return a + b },
 		"sub": func(a, b int) int { return a - b },
 		"mul": func(a, b float64) float64 { return a * b },
-		"div": func(a, b float64) float64 {
+		"div": func(a, b int) float64 {
 			if b == 0 {
 				return 0
 			}
-			return a / b
+			return float64(a) / float64(b)
 		},
 		"until": func(n int) []int {
 			result := make([]int, n)
