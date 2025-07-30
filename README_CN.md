@@ -1,6 +1,6 @@
 <div align="center">
 
-# [![PongHub](static/band.png)](https://health.ch3nyang.top)
+# [![PongHub](imgs/band.png)](https://health.ch3nyang.top)
 
 🌏 [Live Demo](https://health.ch3nyang.top) | 📖 [English](README.md)
 
@@ -19,7 +19,7 @@ PongHub 是一个开源的服务状态监控网站，旨在帮助用户监控和
 - **📊 实时状态展示** - 直观的服务响应时间、响应状态记录
 - **⚠️ 异常告警通知** - 利用 GitHub Actions 实现异常告警通知
 
-![浏览器截图](static/browser_CN.png)
+![浏览器截图](imgs/browser_CN.png)
 
 ## 快速开始
 

@@ -1,8 +1,11 @@
 package main
 
 import (
-	ponghub "github.com/wcy-dt/ponghub/internal"
-	"github.com/wcy-dt/ponghub/protos/default_config"
+	"github.com/wcy-dt/ponghub/internal/config"
+	"github.com/wcy-dt/ponghub/internal/notify"
+	"github.com/wcy-dt/ponghub/internal/process"
+	"github.com/wcy-dt/ponghub/internal/report"
+	"github.com/wcy-dt/ponghub/internal/types/default_config"
 	"io"
 	"log"
 	"os"
@@ -13,7 +16,7 @@ import (
 // TestMain_append tests the main functionality when appending to an existing log file.
 func TestMain_append(t *testing.T) {
 	// load the default configuration
-	cfg, err := ponghub.LoadConfig(default_config.GetConfigPath())
+	cfg, err := config.LoadConfig(default_config.GetConfigPath())
 	if err != nil {
 		log.Fatalln("Error loading config at", default_config.GetConfigPath(), ":", err)
 	}
@@ -25,15 +28,15 @@ func TestMain_append(t *testing.T) {
 	}
 
 	// check services based on the configuration
-	results := ponghub.CheckServices(cfg)
-	ponghub.NotifyResults(results)
-	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	results := process.CheckServices(cfg)
+	notify.NotifyResults(results)
+	logData, err := process.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)
 	}
 
 	// generate the report based on the results
-	if err := ponghub.GenerateReport(logData, default_config.GetReportPath()); err != nil {
+	if err := report.GenerateReport(logData, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -48,21 +51,21 @@ func TestMain_append(t *testing.T) {
 // TestMain_new tests the main functionality when creating a new log file.
 func TestMain_new(t *testing.T) {
 	// load the default configuration
-	cfg, err := ponghub.LoadConfig(default_config.GetConfigPath())
+	cfg, err := config.LoadConfig(default_config.GetConfigPath())
 	if err != nil {
 		log.Fatalln("Error loading config at", default_config.GetConfigPath(), ":", err)
 	}
 
 	// check services based on the configuration
-	results := ponghub.CheckServices(cfg)
-	ponghub.NotifyResults(results)
-	logData, err := ponghub.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	results := process.CheckServices(cfg)
+	notify.NotifyResults(results)
+	logData, err := process.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)
 	}
 
 	// generate the report based on the results
-	if err := ponghub.GenerateReport(logData, default_config.GetReportPath()); err != nil {
+	if err := report.GenerateReport(logData, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -105,7 +108,7 @@ const tmpLogPath = "data/ponghub_log_test.json"
 
 func TestMain(m *testing.M) {
 	// Change the working directory to the root of the project
-	root, err := filepath.Abs("..")
+	root, err := filepath.Abs("../..")
 	if err != nil {
 		panic(err)
 	}

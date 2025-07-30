@@ -1,8 +1,9 @@
-package internal
+package process
 
 import (
 	"encoding/json"
-	"github.com/wcy-dt/ponghub/protos/test_result"
+	"github.com/wcy-dt/ponghub/internal/types"
+	"github.com/wcy-dt/ponghub/internal/types/test_result"
 	"log"
 	"os"
 	"time"
@@ -34,9 +35,9 @@ func MergeOnlineStatus(statuses []test_result.TestResult) test_result.TestResult
 	}
 }
 
-// loadExistingLog loads log data from file or returns empty data
-func loadExistingLog(logPath string) (LogData, error) {
-	data := make(LogData)
+// LoadExistingLog loads log data from file or returns empty data
+func LoadExistingLog(logPath string) (types.LogData, error) {
+	data := make(types.LogData)
 
 	content, err := os.ReadFile(logPath)
 	if err != nil {
@@ -53,7 +54,7 @@ func loadExistingLog(logPath string) (LogData, error) {
 }
 
 // saveLogData writes log data to file
-func saveLogData(data LogData, logPath string) error {
+func saveLogData(data types.LogData, logPath string) error {
 	content, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
@@ -62,7 +63,7 @@ func saveLogData(data LogData, logPath string) error {
 }
 
 // processCheckResult processes the check results for a service
-func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, map[string]string, map[string]time.Duration) {
+func processCheckResult(svc types.CheckResult) (map[string][]test_result.TestResult, map[string]string, map[string]time.Duration) {
 	urlStatusMap := make(map[string][]test_result.TestResult)
 	urlTimeMap := make(map[string]string)
 	urlResponseTimeMap := make(map[string]time.Duration)
@@ -97,8 +98,8 @@ func processCheckResult(svc CheckResult) (map[string][]test_result.TestResult, m
 }
 
 // OutputResults writes check results to JSON file
-func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogData, error) {
-	logData, err := loadExistingLog(logPath)
+func OutputResults(results []types.CheckResult, maxLogDays int, logPath string) (types.LogData, error) {
+	logData, err := LoadExistingLog(logPath)
 	if err != nil {
 		log.Printf("Error loading log data from %s: %v", logPath, err)
 		return nil, err
@@ -108,14 +109,14 @@ func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogDa
 		serviceName := svc.Name
 		serviceLog, exists := logData[serviceName]
 		if !exists {
-			serviceLog = LogEntry{
-				ServiceHistory: HistoryEntryList{},
-				PortsData:      make(PortHistory),
+			serviceLog = types.LogEntry{
+				ServiceHistory: types.HistoryEntryList{},
+				PortsData:      make(types.PortHistory),
 			}
 		}
 
 		// Update service history
-		newHistoryEntry := HistoryEntry{
+		newHistoryEntry := types.HistoryEntry{
 			Time:   svc.StartTime,
 			Status: svc.Online.String(),
 		}
@@ -126,7 +127,7 @@ func OutputResults(results []CheckResult, maxLogDays int, logPath string) (LogDa
 		urlStatusMap, urlTimeMap, urlResponseTimeMap := processCheckResult(svc)
 		for url, statuses := range urlStatusMap {
 			mergedStatus := MergeOnlineStatus(statuses)
-			newEntry := HistoryEntry{
+			newEntry := types.HistoryEntry{
 				Time:         urlTimeMap[url],
 				Status:       mergedStatus.String(),
 				ResponseTime: int(urlResponseTimeMap[url].Milliseconds()),

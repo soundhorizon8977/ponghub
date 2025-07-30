@@ -1,6 +1,7 @@
-package internal
+package report
 
 import (
+	"github.com/wcy-dt/ponghub/internal/process"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,7 +12,7 @@ func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
 	outPath := "data/index.html"
 
-	logData, err := loadExistingLog(logPath)
+	logData, err := process.LoadExistingLog(logPath)
 	if err != nil {
 		t.Fatalf("Failed to load log data: %v", err)
 	}
@@ -36,7 +37,7 @@ func TestGenerateReport(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	// Change the working directory to the root of the project
-	root, err := filepath.Abs("..")
+	root, err := filepath.Abs("../..")
 	if err != nil {
 		panic(err)
 	}

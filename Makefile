@@ -1,7 +1,7 @@
-# Makefile for ponghub Go project
+PROJECT_NAME=ponghub
 
-BINARY=bin/ponghub.exe
-SRC=cmd/main.go
+BINARY=bin/$(PROJECT_NAME)
+SRC=cmd/$(PROJECT_NAME)/*.go
 
 .PHONY: all build run clean
 

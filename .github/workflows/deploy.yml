@@ -35,9 +35,7 @@ jobs:
         run: |
           mkdir -p publish/static
           cp -r data/* publish/
-          cp static/style.css publish/static/
-          cp static/logo.png publish/static/
-          cp static/icon.png publish/static/
+          cp -r static/* publish/static/
           if [ -f CNAME ]; then
             cp CNAME publish/
           else

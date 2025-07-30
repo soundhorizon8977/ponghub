@@ -1,7 +1,8 @@
-package internal
+package config
 
 import (
-	"github.com/wcy-dt/ponghub/protos/default_config"
+	"github.com/wcy-dt/ponghub/internal/types"
+	"github.com/wcy-dt/ponghub/internal/types/default_config"
 	"log"
 	"os"
 
@@ -9,7 +10,7 @@ import (
 )
 
 // SetDefaultFields sets default values for the configuration fields
-func SetDefaultFields(cfg *Config) {
+func SetDefaultFields(cfg *types.Config) {
 	default_config.SetDefaultTimeout(&cfg.Timeout)
 	default_config.SetDefaultRetry(&cfg.Retry)
 	default_config.SetDefaultMaxLogDays(&cfg.MaxLogDays)
@@ -21,7 +22,7 @@ func SetDefaultFields(cfg *Config) {
 }
 
 // LoadConfig loads the configuration from a YAML file at the specified path
-func LoadConfig(path string) (*Config, error) {
+func LoadConfig(path string) (*types.Config, error) {
 	// Read the configuration file
 	f, err := os.Open(path)
 	if err != nil {
@@ -34,7 +35,7 @@ func LoadConfig(path string) (*Config, error) {
 	}(f)
 
 	// Decode the YAML configuration
-	cfg := new(Config)
+	cfg := new(types.Config)
 	decoder := yaml.NewDecoder(f)
 	if err := decoder.Decode(cfg); err != nil {
 		log.Fatalln("Failed to decode YAML config:", err)

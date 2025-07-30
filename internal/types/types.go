@@ -1,7 +1,7 @@
-package internal
+package types
 
 import (
-	"github.com/wcy-dt/ponghub/protos/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/test_result"
 	"log"
 	"time"
 )

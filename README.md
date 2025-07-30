@@ -1,6 +1,6 @@
 <div align="center">
 
-# [![PongHub](static/band.png)](https://health.ch3nyang.top)
+# [![PongHub](imgs/band.png)](https://health.ch3nyang.top)
 
 🌏 [Live Demo](https://health.ch3nyang.top) | 📖 [简体中文](README_CN.md)
 
@@ -19,7 +19,7 @@ PongHub is an open-source service status monitoring website designed to help use
 - **📊 Real-time Status Display** - Intuitive service response time and status records
 - **⚠️ Exception Alert Notifications** - Exception alert notifications using GitHub Actions
 
-![Browser Screenshot](static/browser.png)
+![Browser Screenshot](imgs/browser.png)
 
 ## Quick Start
 
