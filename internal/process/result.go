@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-// MergeOnlineStatus merges multiple statuses into a single status
-func MergeOnlineStatus(statuses []test_result.TestResult) test_result.TestResult {
+// mergeOnlineStatus merges multiple statuses into a single status
+func mergeOnlineStatus(statuses []test_result.TestResult) test_result.TestResult {
 	if len(statuses) == 0 {
 		return test_result.NONE
 	}
@@ -126,7 +126,7 @@ func OutputResults(results []types.CheckResult, maxLogDays int, logPath string) 
 		// Update port statuses
 		urlStatusMap, urlTimeMap, urlResponseTimeMap := processCheckResult(svc)
 		for url, statuses := range urlStatusMap {
-			mergedStatus := MergeOnlineStatus(statuses)
+			mergedStatus := mergeOnlineStatus(statuses)
 			newEntry := types.HistoryEntry{
 				Time:         urlTimeMap[url],
 				Status:       mergedStatus.String(),
