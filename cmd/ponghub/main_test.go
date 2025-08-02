@@ -30,7 +30,7 @@ func TestMain_append(t *testing.T) {
 
 	// check services based on the configuration
 	checkResult := checker.CheckServices(cfg)
-	notifier.WriteNotifications(checkResult)
+	notifier.WriteNotifications(checkResult, cfg.CertNotifyDays)
 	_, err = logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting checkResult:", err)
@@ -60,7 +60,7 @@ func TestMain_new(t *testing.T) {
 
 	// check services based on the configuration
 	checkResult := checker.CheckServices(cfg)
-	notifier.WriteNotifications(checkResult)
+	notifier.WriteNotifications(checkResult, cfg.CertNotifyDays)
 	_, err = logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting checkResult:", err)

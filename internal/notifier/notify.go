@@ -9,13 +9,22 @@ import (
 )
 
 // WriteNotifications sends notifications based on the service check results
-func WriteNotifications(checkResult []checker.Checker) {
-	// find all endpointURLs with status NONE
-	nonePorts := make(map[string][]string)
+func WriteNotifications(checkResult []checker.Checker, certNotifyDays int) {
+	// find all endpoints with status NONE
+	statusNoneEndpoints := make(map[string][]string)
 	for _, serviceResult := range checkResult {
 		for _, endpointResult := range serviceResult.Endpoints {
 			if endpointResult.Status == chk_result.NONE {
-				nonePorts[serviceResult.Name] = append(nonePorts[serviceResult.Name], endpointResult.URL)
+				statusNoneEndpoints[serviceResult.Name] = append(statusNoneEndpoints[serviceResult.Name], endpointResult.URL)
+			}
+		}
+	}
+	// find all endpoints whose certificates are expired or has less than 7 days remaining
+	certProblemEndpoints := make(map[string][]string)
+	for _, serviceResult := range checkResult {
+		for _, endpointResult := range serviceResult.Endpoints {
+			if endpointResult.IsHTTPS && (endpointResult.IsCertExpired || endpointResult.CertRemainingDays <= certNotifyDays) {
+				certProblemEndpoints[serviceResult.Name] = append(certProblemEndpoints[serviceResult.Name], endpointResult.URL)
 			}
 		}
 	}
@@ -26,7 +35,7 @@ func WriteNotifications(checkResult []checker.Checker) {
 		log.Println("Error removing notify file:", err)
 		return
 	}
-	if len(nonePorts) == 0 {
+	if len(statusNoneEndpoints) == 0 {
 		// if no endpointURLs are down, do nothing
 		return
 	}
@@ -41,13 +50,25 @@ func WriteNotifications(checkResult []checker.Checker) {
 			log.Println("Error closing notify file:", err)
 		}
 	}()
-	for serviceName, endpointURLs := range nonePorts {
+	for serviceName, endpointURLs := range statusNoneEndpoints {
 		if _, err := f.WriteString(serviceName + "\n"); err != nil {
 			log.Println("Error writing to notify file:", err)
 			return
 		}
 		for _, endpointURL := range endpointURLs {
 			if _, err := f.WriteString("\t" + endpointURL + " is unavailable.\n"); err != nil {
+				log.Println("Error writing to notify file:", err)
+				return
+			}
+		}
+	}
+	for serviceName, endpointURLs := range certProblemEndpoints {
+		if _, err := f.WriteString(serviceName + "\n"); err != nil {
+			log.Println("Error writing to notify file:", err)
+			return
+		}
+		for _, endpointURL := range endpointURLs {
+			if _, err := f.WriteString("\t" + endpointURL + " has certificate issues.\n"); err != nil {
 				log.Println("Error writing to notify file:", err)
 				return
 			}

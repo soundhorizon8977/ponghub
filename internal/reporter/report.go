@@ -22,12 +22,11 @@ func GetReport(checkResult []checker.Checker, logPath string) (reporter.Reporter
 
 	reportResult := reporter.ParseLogResult(logResult)
 
+	// calculate availability
 	for serviceName, serviceLog := range logResult {
 		if len(serviceLog.ServiceHistory) == 0 {
 			continue
 		}
-
-		// calculate availability
 		statusAllEntryNum := 0
 		for _, entry := range serviceLog.ServiceHistory {
 			if chk_result.IsALL(entry.Status) {
@@ -38,6 +37,20 @@ func GetReport(checkResult []checker.Checker, logPath string) (reporter.Reporter
 		tmp := reportResult[serviceName]
 		tmp.Availability = availability
 		reportResult[serviceName] = tmp
+	}
+
+	// calculate cert status
+	for _, serviceResult := range checkResult {
+		serviceName := serviceResult.Name
+		for _, endpointResult := range serviceResult.Endpoints {
+			url := endpointResult.URL
+
+			tmp := reportResult[serviceName].Endpoints[url]
+			tmp.IsHTTPS = endpointResult.IsHTTPS
+			tmp.CertRemainingDays = endpointResult.CertRemainingDays
+			tmp.IsCertExpired = endpointResult.IsCertExpired
+			reportResult[serviceName].Endpoints[url] = tmp
+		}
 	}
 
 	return reportResult, nil

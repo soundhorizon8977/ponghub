@@ -14,6 +14,7 @@ func setDefaultConfigs(cfg *configure.Configure) {
 	default_config.SetDefaultTimeout(&cfg.Timeout)
 	default_config.SetDefaultMaxRetryTimes(&cfg.MaxRetryTimes)
 	default_config.SetDefaultMaxLogDays(&cfg.MaxLogDays)
+	default_config.SetDefaultCertNotifyDays(&cfg.CertNotifyDays)
 
 	for i := range cfg.Services {
 		default_config.SetDefaultTimeout(&cfg.Services[i].Timeout)

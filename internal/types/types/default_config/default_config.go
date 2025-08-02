@@ -9,6 +9,9 @@ const (
 
 	// maxLogDays is the default maximum number of days to keep logs
 	maxLogDays = 3
+
+	// certNotifyDays is the default number of days to notify before certificate expiration
+	certNotifyDays = 7
 )
 
 // GetDefaultTimeout returns the default timeout for service checks
@@ -24,6 +27,11 @@ func GetDefaultMaxRetryTimes() int {
 // GetDefaultMaxLogDays returns the default maximum number of days to keep logs
 func GetDefaultMaxLogDays() int {
 	return maxLogDays
+}
+
+// GetDefaultCertNotifyDays returns the default number of days to notify before certificate expiration
+func GetDefaultCertNotifyDays() int {
+	return certNotifyDays
 }
 
 // SetDefaultTimeout sets the default timeout for a given configuration pointer
@@ -44,6 +52,13 @@ func SetDefaultMaxRetryTimes(cfg *int) {
 func SetDefaultMaxLogDays(cfg *int) {
 	if cfg == nil || *cfg <= 0 {
 		*cfg = GetDefaultMaxLogDays()
+	}
+}
+
+// SetDefaultCertNotifyDays sets the default number of days to notify before certificate expiration for a given configuration pointer
+func SetDefaultCertNotifyDays(cfg *int) {
+	if cfg == nil || *cfg <= 0 {
+		*cfg = GetDefaultCertNotifyDays()
 	}
 }
 

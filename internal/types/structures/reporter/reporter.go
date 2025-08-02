@@ -12,10 +12,10 @@ type (
 	History []HistoryEntry
 
 	Endpoint struct {
-		EndpointHistory History
-		//IsHTTPS         bool
-		//IsSSLExpired    bool
-		//SSLRemainedDays int
+		EndpointHistory   History
+		IsHTTPS           bool
+		IsCertExpired     bool
+		CertRemainingDays int
 	}
 
 	Endpoints map[string]Endpoint

@@ -64,7 +64,14 @@
                 {{ $last := index $arr (sub (len $arr) 1) }}
                 <div class="port-url status-info-{{ $last.Status }}">
                     <span class="status-ball"></span>
-                    {{$url}}
+                    <span class="url-text">{{$url}}</span>
+                    <div class="cert-status
+                        cert-status-{{ if not $endpoint.IsHTTPS }}gray{{ else if $endpoint.IsCertExpired }}red{{ else if le $endpoint.CertRemainingDays 30 }}yellow{{ else }}green{{ end }}"
+                        data-time="{{ if $endpoint.IsCertExpired }}Cert has expired{{ else }}Cert will expire in {{ $endpoint.CertRemainingDays }} days{{ end }}">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 11.5a1.504 1.504 0 0 0-1.5-1.5H18V7A6 6 0 0 0 6 7v3H4.5A1.504 1.504 0 0 0 3 11.5v10A1.504 1.504 0 0 0 4.5 23h15a1.504 1.504 0 0 0 1.5-1.5zM9 7a3 3 0 0 1 6 0v3H9zm4 8h-1v1h1v1h-1v1h1v1h-1v1h-1v-5h1v-1h1z"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="port-response-time">
                     {{/* red > 1000, 100 < yellow <= 1000, green <= 100 */}}

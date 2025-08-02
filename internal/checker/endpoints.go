@@ -25,6 +25,25 @@ func checkEndpoint(cfg *configure.Endpoint, timeout int, maxRetryTimes int, serv
 	httpMethod := getHttpMethod(cfg.Method)
 	maxResponseTime := time.Duration(0)
 
+	// SSL certificate related variables
+	urlIsHTTPS := isHTTPS(cfg.URL)
+	certRemainingDays := 0
+	isCertExpired := false
+
+	// Check SSL certificate if it's an HTTPS URL
+	if urlIsHTTPS {
+		remainingDays, expired, err := checkSSLCertificates(cfg.URL)
+		if err != nil {
+			urlIsHTTPS = false
+			log.Printf("SSL certificate check failed for %s: %v", cfg.URL, err)
+			failureDetails = append(failureDetails, fmt.Sprintf("SSL Certificate Error: %s", err.Error()))
+		} else {
+			certRemainingDays = remainingDays
+			isCertExpired = expired
+			log.Printf("SSL Certificate Info for %s: %d days remaining, expired: %v", cfg.URL, remainingDays, expired)
+		}
+	}
+
 	startTime := time.Now()
 	for currentAttemptNum := range maxRetryTimes {
 		attemptNum++
@@ -62,7 +81,7 @@ func checkEndpoint(cfg *configure.Endpoint, timeout int, maxRetryTimes int, serv
 			failureDetails = append(failureDetails, fmt.Sprintf("StatusCode: %d, Error: %s", resp.StatusCode, err.Error()))
 			log.Printf("FAILED - StatusCode: %d, Error: %s", resp.StatusCode, err.Error())
 			if err := resp.Body.Close(); err != nil {
-				log.Printf("Error closing response body for %s: %headerValue", cfg.URL, err)
+				log.Printf("Error closing response body for %s: %v", cfg.URL, err)
 			}
 			continue
 		}
@@ -78,7 +97,7 @@ func checkEndpoint(cfg *configure.Endpoint, timeout int, maxRetryTimes int, serv
 			}
 			responseBody = ""
 			if err := resp.Body.Close(); err != nil {
-				log.Printf("Error closing response body for %s: %headerValue", cfg.URL, err)
+				log.Printf("Error closing response body for %s: %v", cfg.URL, err)
 			}
 			log.Printf("SUCCESS - %s %s (attempt %d/%d) - Response Time: %d ms, Status Code: %d",
 				httpMethod, cfg.URL, currentAttemptNum+1, maxRetryTimes, responseTime.Milliseconds(), resp.StatusCode)
@@ -87,24 +106,27 @@ func checkEndpoint(cfg *configure.Endpoint, timeout int, maxRetryTimes int, serv
 		failureDetails = append(failureDetails, fmt.Sprintf("StatusCode or ResponseRegex mismatch: %d", resp.StatusCode))
 		log.Printf("FAILED - StatusCode or ResponseRegex mismatch: %d", resp.StatusCode)
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("Error closing response body for %s: %headerValue", cfg.URL, err)
+			log.Printf("Error closing response body for %s: %v", cfg.URL, err)
 		}
 	}
 	endTime := time.Now()
 
 	return checker.Endpoint{
-		URL:            cfg.URL,
-		Method:         httpMethod,
-		Body:           cfg.Body,
-		Status:         getTestResult(successNum, attemptNum),
-		StatusCode:     statusCode,
-		StartTime:      startTime.Format(time.RFC3339),
-		EndTime:        endTime.Format(time.RFC3339),
-		ResponseTime:   maxResponseTime,
-		AttemptNum:     attemptNum,
-		SuccessNum:     successNum,
-		FailureDetails: failureDetails,
-		ResponseBody:   responseBody,
+		URL:               cfg.URL,
+		Method:            httpMethod,
+		Body:              cfg.Body,
+		Status:            getTestResult(successNum, attemptNum),
+		StatusCode:        statusCode,
+		StartTime:         startTime.Format(time.RFC3339),
+		EndTime:           endTime.Format(time.RFC3339),
+		ResponseTime:      maxResponseTime,
+		AttemptNum:        attemptNum,
+		SuccessNum:        successNum,
+		FailureDetails:    failureDetails,
+		ResponseBody:      responseBody,
+		IsHTTPS:           urlIsHTTPS,
+		CertRemainingDays: certRemainingDays,
+		IsCertExpired:     isCertExpired,
 	}
 }
 

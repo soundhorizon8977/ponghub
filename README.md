@@ -16,6 +16,7 @@ PongHub is an open-source service status monitoring website designed to help use
 - **🔍 Multi-port Detection** - Monitor multiple ports for a single service
 - **🤖 Intelligent Response Validation** - Precise matching of status codes and regex validation of response bodies
 - **🛠️ Custom Request Engine** - Flexible configuration of request headers/bodies, timeouts, and retry strategies
+- **🔒 SSL Certificate Monitoring** - Automatic detection of SSL certificate expiration and notifications
 - **📊 Real-time Status Display** - Intuitive service response time and status records
 - **⚠️ Exception Alert Notifications** - Exception alert notifications using GitHub Actions
 
@@ -52,6 +53,7 @@ The `config.yaml` file follows this format:
 | `timeout`                           | Integer | Timeout for each request in seconds                      | ✖️       | Units are seconds, default is 5 seconds       |
 | `max_retry_times`                   | Integer | Number of retries on request failure                     | ✖️       | Default is 2 retries                          |
 | `max_log_days`                      | Integer | Number of days to retain logs                            | ✖️       | Default is 3 days                             |
+| `cert_notify_days`                  | Integer | Days before SSL certificate expiration to notify         | ✖️       | Default is 7 days                             |
 | `services`                          | Array   | List of services to monitor                              | ✔️       |                                               |
 | `services.name`                     | String  | Name of the service                                      | ✔️       |                                               |
 | `services.endpoints`                | Array   | List of endpoints to check for the service               | ✔️       |                                               |                                               |
@@ -68,6 +70,7 @@ Here is an example configuration file:
 timeout: 5
 max_retry_times: 2
 max_log_days: 3
+cert_notify_days: 7
 services:
   - name: "GitHub API"
     endpoints:
