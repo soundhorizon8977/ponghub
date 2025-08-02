@@ -12,12 +12,12 @@ import (
 // setDefaultConfigs sets default values for the configuration fields
 func setDefaultConfigs(cfg *configure.Configure) {
 	default_config.SetDefaultTimeout(&cfg.Timeout)
-	default_config.SetDefaultRetry(&cfg.Retry)
+	default_config.SetDefaultMaxRetryTimes(&cfg.MaxRetryTimes)
 	default_config.SetDefaultMaxLogDays(&cfg.MaxLogDays)
 
 	for i := range cfg.Services {
 		default_config.SetDefaultTimeout(&cfg.Services[i].Timeout)
-		default_config.SetDefaultRetry(&cfg.Services[i].Retry)
+		default_config.SetDefaultMaxRetryTimes(&cfg.Services[i].MaxRetryTimes)
 	}
 }
 

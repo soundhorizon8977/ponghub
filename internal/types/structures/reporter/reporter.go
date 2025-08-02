@@ -4,19 +4,19 @@ package reporter
 type (
 	// HistoryEntry represents a single history entry
 	HistoryEntry struct {
-		Time         string `json:"time"`
-		Status       string `json:"online"`
-		ResponseTime int    `json:"response_time,omitempty"`
+		Time         string
+		Status       string
+		ResponseTime int
 	}
 
-	History []HistoryEntry
-	Port    map[string]History
+	History   []HistoryEntry
+	Endpoints map[string]History
 
-	// ReportEntry represents the result of checking a service
-	ReportEntry struct {
-		Name         string
-		History      History
-		Ports        Port
-		Availability float64
+	// Reporter represents the result of checking a service
+	Reporter struct {
+		Name           string
+		ServiceHistory History
+		Endpoints      Endpoints
+		Availability   float64
 	}
 )

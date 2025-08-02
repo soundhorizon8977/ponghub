@@ -7,26 +7,26 @@ import (
 	"testing"
 )
 
-// TestGenerateReport tests the GenerateReport function to ensure it generates a report file correctly.
+// TestGenerateReport tests the WriteReport function to ensure it generates a report file correctly.
 func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
-	outPath := "data/index.html"
+	reportPath := "data/index.html"
 
-	logData, err := logger.LoadExistingLog(logPath)
+	logResult, err := logger.ReadLogs(logPath)
 	if err != nil {
 		t.Fatalf("Failed to load log data: %v", err)
 	}
 
-	err = GenerateReport(logData, outPath)
+	err = WriteReport(logResult, reportPath)
 	if err != nil {
-		t.Fatalf("GenerateReport failed: %v", err)
+		t.Fatalf("WriteReport failed: %v", err)
 	}
 
-	if _, err := os.Stat(outPath); os.IsNotExist(err) {
-		t.Fatalf("Report file not generated: %s", outPath)
+	if _, err := os.Stat(reportPath); os.IsNotExist(err) {
+		t.Fatalf("Report file not generated: %s", reportPath)
 	}
 
-	f, err := os.ReadFile(outPath)
+	f, err := os.ReadFile(reportPath)
 	if err != nil {
 		t.Fatalf("Failed to read generated report: %v", err)
 	}

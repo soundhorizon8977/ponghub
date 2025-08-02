@@ -4,8 +4,8 @@ const (
 	// timeout is the default timeout for service checks in seconds
 	timeout = 5
 
-	// retry is the default retry count for service checks
-	retry = 2
+	// maxRetryTimes is the default maxRetryTimes count for service checks
+	maxRetryTimes = 2
 
 	// maxLogDays is the default maximum number of days to keep logs
 	maxLogDays = 3
@@ -16,9 +16,9 @@ func GetDefaultTimeout() int {
 	return timeout
 }
 
-// GetDefaultRetry returns the default retry count for service checks
-func GetDefaultRetry() int {
-	return retry
+// GetDefaultMaxRetryTimes returns the default maxRetryTimes count for service checks
+func GetDefaultMaxRetryTimes() int {
+	return maxRetryTimes
 }
 
 // GetDefaultMaxLogDays returns the default maximum number of days to keep logs
@@ -33,10 +33,10 @@ func SetDefaultTimeout(cfg *int) {
 	}
 }
 
-// SetDefaultRetry sets the default retry count for a given configuration pointer
-func SetDefaultRetry(cfg *int) {
+// SetDefaultMaxRetryTimes sets the default maxRetryTimes count for a given configuration pointer
+func SetDefaultMaxRetryTimes(cfg *int) {
 	if cfg == nil || *cfg <= 0 {
-		*cfg = GetDefaultRetry()
+		*cfg = GetDefaultMaxRetryTimes()
 	}
 }
 

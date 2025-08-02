@@ -1,17 +1,16 @@
 package configure
 
 type (
-	// Service defines the configuration for a service, including its health and API ports
+	// Service defines the configuration for a service, including its health and Endpoints ports
 	Service struct {
-		Name    string `yaml:"name"`
-		Health  []Port `yaml:"health"`
-		API     []Port `yaml:"api"`
-		Timeout int    `yaml:"timeout,omitempty"`
-		Retry   int    `yaml:"retry,omitempty"`
+		Name          string     `yaml:"name"`
+		Endpoints     []Endpoint `yaml:"endpoints"`
+		Timeout       int        `yaml:"timeout,omitempty"`
+		MaxRetryTimes int        `yaml:"max_retry_times,omitempty"`
 	}
 
-	// Port defines the configuration for a port
-	Port struct {
+	// Endpoint defines the configuration for a port
+	Endpoint struct {
 		URL           string            `yaml:"url"`
 		Method        string            `yaml:"method,omitempty"`
 		Headers       map[string]string `yaml:"headers,omitempty"`
@@ -22,9 +21,9 @@ type (
 
 	// Configure defines the overall configuration structure for the application
 	Configure struct {
-		Services   []Service `yaml:"services"`
-		Timeout    int       `yaml:"timeout,omitempty"`
-		Retry      int       `yaml:"retry,omitempty"`
-		MaxLogDays int       `yaml:"max_log_days,omitempty"`
+		Services      []Service `yaml:"services"`
+		Timeout       int       `yaml:"timeout,omitempty"`
+		MaxRetryTimes int       `yaml:"max_retry_times,omitempty"`
+		MaxLogDays    int       `yaml:"max_log_days,omitempty"`
 	}
 )

@@ -1,7 +1,7 @@
 package checker
 
 import (
-	"github.com/wcy-dt/ponghub/internal/types/types/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/types/chk_result"
 	"time"
 )
 
@@ -9,29 +9,28 @@ import (
 type (
 	// Checker defines the structure for the result of checking a service
 	Checker struct {
-		Name          string                 `json:"name"`
-		Online        test_result.TestResult `json:"online"`
-		Health        []Port                 `json:"health,omitempty"`
-		API           []Port                 `json:"api,omitempty"`
-		StartTime     string                 `json:"start_time"`
-		EndTime       string                 `json:"end_time"`
-		TotalAttempts int                    `json:"total_attempts"`
-		SuccessCount  int                    `json:"success_count"`
+		Name       string                 `json:"name"`
+		Status     chk_result.CheckResult `json:"status"`
+		Endpoints  []Endpoint             `json:"endpoints,omitempty"`
+		StartTime  string                 `json:"start_time"`
+		EndTime    string                 `json:"end_time"`
+		AttemptNum int                    `json:"attempt_num"`
+		SuccessNum int                    `json:"success_num"`
 	}
 
-	// Port defines the structure for the result of checking a port
-	Port struct {
-		URL           string                 `json:"url"`
-		Method        string                 `json:"method"`
-		Body          string                 `json:"body,omitempty"`
-		Online        test_result.TestResult `json:"online"`
-		StatusCode    int                    `json:"status_code,omitempty"`
-		StartTime     string                 `json:"start_time"`
-		EndTime       string                 `json:"end_time"`
-		ResponseTime  time.Duration          `json:"response_time"`
-		TotalAttempts int                    `json:"total_attempts"`
-		SuccessCount  int                    `json:"success_count"`
-		Failures      []string               `json:"failures,omitempty"`
-		ResponseBody  string                 `json:"response_body,omitempty"`
+	// Endpoint defines the structure for the result of checking a port
+	Endpoint struct {
+		URL            string                 `json:"url"`
+		Method         string                 `json:"method"`
+		Body           string                 `json:"body,omitempty"`
+		Status         chk_result.CheckResult `json:"status"`
+		StatusCode     int                    `json:"status_code,omitempty"`
+		StartTime      string                 `json:"start_time"`
+		EndTime        string                 `json:"end_time"`
+		ResponseTime   time.Duration          `json:"response_time"`
+		AttemptNum     int                    `json:"attempt_num"`
+		SuccessNum     int                    `json:"success_num"`
+		FailureDetails []string               `json:"failure_details,omitempty"`
+		ResponseBody   string                 `json:"response_body,omitempty"`
 	}
 )

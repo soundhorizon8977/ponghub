@@ -2,25 +2,20 @@ package notifier
 
 import (
 	"github.com/wcy-dt/ponghub/internal/types/structures/checker"
+	"github.com/wcy-dt/ponghub/internal/types/types/chk_result"
 	"github.com/wcy-dt/ponghub/internal/types/types/default_config"
-	"github.com/wcy-dt/ponghub/internal/types/types/test_result"
 	"log"
 	"os"
 )
 
 // WriteNotifications sends notifications based on the service check results
-func WriteNotifications(results []checker.Checker) {
-	// find all ports with status NONE
+func WriteNotifications(checkResult []checker.Checker) {
+	// find all endpointURLs with status NONE
 	nonePorts := make(map[string][]string)
-	for _, result := range results {
-		for _, h := range result.Health {
-			if h.Online == test_result.NONE {
-				nonePorts[result.Name] = append(nonePorts[result.Name], h.URL)
-			}
-		}
-		for _, a := range result.API {
-			if a.Online == test_result.NONE {
-				nonePorts[result.Name] = append(nonePorts[result.Name], a.URL)
+	for _, serviceResult := range checkResult {
+		for _, endpointResult := range serviceResult.Endpoints {
+			if endpointResult.Status == chk_result.NONE {
+				nonePorts[serviceResult.Name] = append(nonePorts[serviceResult.Name], endpointResult.URL)
 			}
 		}
 	}
@@ -32,7 +27,7 @@ func WriteNotifications(results []checker.Checker) {
 		return
 	}
 	if len(nonePorts) == 0 {
-		// if no ports are down, do nothing
+		// if no endpointURLs are down, do nothing
 		return
 	}
 	// new notify file
@@ -46,13 +41,13 @@ func WriteNotifications(results []checker.Checker) {
 			log.Println("Error closing notify file:", err)
 		}
 	}()
-	for service, ports := range nonePorts {
-		if _, err := f.WriteString(service + "\n"); err != nil {
+	for serviceName, endpointURLs := range nonePorts {
+		if _, err := f.WriteString(serviceName + "\n"); err != nil {
 			log.Println("Error writing to notify file:", err)
 			return
 		}
-		for _, port := range ports {
-			if _, err := f.WriteString("\t" + port + " is unavailable.\n"); err != nil {
+		for _, endpointURL := range endpointURLs {
+			if _, err := f.WriteString("\t" + endpointURL + " is unavailable.\n"); err != nil {
 				log.Println("Error writing to notify file:", err)
 				return
 			}

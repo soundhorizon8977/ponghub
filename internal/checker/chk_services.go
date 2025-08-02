@@ -3,62 +3,44 @@ package checker
 import (
 	"github.com/wcy-dt/ponghub/internal/types/structures/checker"
 	"github.com/wcy-dt/ponghub/internal/types/structures/configure"
-	"github.com/wcy-dt/ponghub/internal/types/types/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/types/chk_result"
 	"time"
 )
 
 // CheckServices checks all services defined in the configuration
 func CheckServices(cfg *configure.Configure) []checker.Checker {
-	var results []checker.Checker
-	for _, svc := range cfg.Services {
-		// start timer
-		svcStart := time.Now()
+	var checkResult []checker.Checker
+	for _, service := range cfg.Services {
+		attemptNum := 0
+		successNum := 0
+		endpointNum := 0
+		onlineEndpointNum := 0
 
-		totalAttempts := 0
-		successCount := 0
-		totalPorts := 0
-		onlinePorts := 0
-
-		// check health ports
-		var healthResults []checker.Port
-		for _, h := range svc.Health {
-			pr := checkPort(&h, svc.Timeout, svc.Retry, svc.Name)
-			healthResults = append(healthResults, pr)
-			totalAttempts += pr.TotalAttempts
-			successCount += pr.SuccessCount
-			totalPorts++
-			if pr.Online == test_result.ALL {
-				onlinePorts++
+		// check Endpoints ports
+		startTime := time.Now()
+		var endpointResults []checker.Endpoint
+		for _, endpoint := range service.Endpoints {
+			endpointResult := checkEndpoint(&endpoint, service.Timeout, service.MaxRetryTimes, service.Name)
+			endpointResults = append(endpointResults, endpointResult)
+			attemptNum += endpointResult.AttemptNum
+			successNum += endpointResult.SuccessNum
+			endpointNum++
+			if endpointResult.Status == chk_result.ALL {
+				onlineEndpointNum++
 			}
 		}
+		endTime := time.Now()
 
-		// check API ports
-		var apiResults []checker.Port
-		for _, a := range svc.API {
-			pr := checkPort(&a, svc.Timeout, svc.Retry, svc.Name)
-			apiResults = append(apiResults, pr)
-			totalAttempts += pr.TotalAttempts
-			successCount += pr.SuccessCount
-			totalPorts++
-			if pr.Online == test_result.ALL {
-				onlinePorts++
-			}
+		serviceResult := checker.Checker{
+			Name:       service.Name,
+			Status:     getTestResult(onlineEndpointNum, endpointNum),
+			Endpoints:  endpointResults,
+			StartTime:  startTime.Format(time.RFC3339),
+			EndTime:    endTime.Format(time.RFC3339),
+			AttemptNum: attemptNum,
+			SuccessNum: successNum,
 		}
-
-		// end timer
-		svcEnd := time.Now()
-
-		res := checker.Checker{
-			Name:          svc.Name,
-			Online:        getTestResult(onlinePorts, totalPorts),
-			Health:        healthResults,
-			API:           apiResults,
-			StartTime:     svcStart.Format(time.RFC3339),
-			EndTime:       svcEnd.Format(time.RFC3339),
-			TotalAttempts: totalAttempts,
-			SuccessCount:  successCount,
-		}
-		results = append(results, res)
+		checkResult = append(checkResult, serviceResult)
 	}
-	return results
+	return checkResult
 }

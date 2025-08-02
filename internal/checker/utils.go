@@ -1,17 +1,17 @@
 package checker
 
 import (
-	"github.com/wcy-dt/ponghub/internal/types/types/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/types/chk_result"
 )
 
 // getTestResult determines the test result based on the success count and actual attempts
-func getTestResult(successCount, actualAttempts int) test_result.TestResult {
-	switch successCount {
-	case actualAttempts:
-		return test_result.ALL
+func getTestResult(successNum, attemptNum int) chk_result.CheckResult {
+	switch successNum {
+	case attemptNum:
+		return chk_result.ALL
 	case 0:
-		return test_result.NONE
+		return chk_result.NONE
 	default:
-		return test_result.PART
+		return chk_result.PART
 	}
 }

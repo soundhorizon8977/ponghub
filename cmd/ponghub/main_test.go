@@ -29,15 +29,15 @@ func TestMain_append(t *testing.T) {
 	}
 
 	// check services based on the configuration
-	results := checker.CheckServices(cfg)
-	notifier.WriteNotifications(results)
-	logData, err := logger.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	checkResult := checker.CheckServices(cfg)
+	notifier.WriteNotifications(checkResult)
+	logResult, err := logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
-		log.Fatalln("Error outputting results:", err)
+		log.Fatalln("Error outputting checkResult:", err)
 	}
 
-	// generate the report based on the results
-	if err := reporter.GenerateReport(logData, default_config.GetReportPath()); err != nil {
+	// generate the report based on the checkResult
+	if err := reporter.WriteReport(logResult, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -58,15 +58,15 @@ func TestMain_new(t *testing.T) {
 	}
 
 	// check services based on the configuration
-	results := checker.CheckServices(cfg)
-	notifier.WriteNotifications(results)
-	logData, err := logger.OutputResults(results, cfg.MaxLogDays, tmpLogPath)
+	checkResult := checker.CheckServices(cfg)
+	notifier.WriteNotifications(checkResult)
+	logResult, err := logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
-		log.Fatalln("Error outputting results:", err)
+		log.Fatalln("Error outputting checkResult:", err)
 	}
 
-	// generate the report based on the results
-	if err := reporter.GenerateReport(logData, default_config.GetReportPath()); err != nil {
+	// generate the report based on the checkResult
+	if err := reporter.WriteReport(logResult, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -80,6 +80,14 @@ func TestMain_new(t *testing.T) {
 
 // copyLogFile copies the log file from srcPath to dstPath.
 func copyLogFile(srcPath, dstPath string) error {
+	// remove dstPath if it exists
+	if _, err := os.Stat(dstPath); err == nil {
+		if err := os.Remove(dstPath); err != nil {
+			log.Println("Error removing existing destination file:", err)
+			return err
+		}
+	}
+
 	srcFile, err := os.Open(srcPath)
 	if err != nil {
 		return err

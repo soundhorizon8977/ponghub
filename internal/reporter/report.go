@@ -8,26 +8,9 @@ import (
 	"os"
 )
 
-// getLatestTime retrieves the latest time from the log data
-func getLatestTime(logData logger.Logger) string {
-	var latestTime string
-
-	for _, svcData := range logData {
-		for _, entry := range svcData.ServiceHistory {
-			if latestTime == "" {
-				latestTime = entry.Time
-			} else if entry.Time > latestTime {
-				latestTime = entry.Time
-			}
-		}
-	}
-
-	return latestTime
-}
-
-// GenerateReport generates an HTML report from the provided log data
-func GenerateReport(logData logger.Logger, outPath string) error {
-	reportEntries := logData.ParseToReportEntries()
+// WriteReport generates an HTML report from the provided log data
+func WriteReport(logResult logger.Logger, reportPath string) error {
+	reportResult := logResult.ParseToReportEntries()
 
 	tmpl, err := template.New("report.html").
 		Funcs(createTemplateFunc()).
@@ -36,24 +19,41 @@ func GenerateReport(logData logger.Logger, outPath string) error {
 		return fmt.Errorf("template parsing failed: %w", err)
 	}
 
-	outputFile, err := os.Create(outPath)
+	reportFile, err := os.Create(reportPath)
 	if err != nil {
 		return fmt.Errorf("file creation failed: %w", err)
 	}
-	defer func(outputFile *os.File) {
-		if err := outputFile.Close(); err != nil {
+	defer func(reportFile *os.File) {
+		if err := reportFile.Close(); err != nil {
 			fmt.Printf("Error closing output file: %v\n", err)
 		}
-	}(outputFile)
+	}(reportFile)
 
-	if err := tmpl.Execute(outputFile, map[string]any{
-		"Results":    reportEntries,
-		"UpdateTime": getLatestTime(logData),
+	if err := tmpl.Execute(reportFile, map[string]any{
+		"ReportResult": reportResult,
+		"UpdateTime":   getLatestTime(logResult),
 	}); err != nil {
 		return fmt.Errorf("template execution failed: %w", err)
 	}
 
 	return nil
+}
+
+// getLatestTime retrieves the latest time from the log data
+func getLatestTime(logResult logger.Logger) string {
+	var latestTime string
+
+	for _, serviceResult := range logResult {
+		for _, serviceHistoryEntry := range serviceResult.ServiceHistory {
+			if latestTime == "" {
+				latestTime = serviceHistoryEntry.Time
+			} else if serviceHistoryEntry.Time > latestTime {
+				latestTime = serviceHistoryEntry.Time
+			}
+		}
+	}
+
+	return latestTime
 }
 
 // createTemplateFunc defines custom template functions for the report

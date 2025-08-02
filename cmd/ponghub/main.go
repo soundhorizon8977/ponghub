@@ -18,15 +18,15 @@ func main() {
 	}
 
 	// check services based on the configuration
-	results := checker.CheckServices(cfg)
-	notifier.WriteNotifications(results)
-	logData, err := logger.OutputResults(results, cfg.MaxLogDays, default_config.GetLogPath())
+	checkResult := checker.CheckServices(cfg)
+	notifier.WriteNotifications(checkResult)
+	logResult, err := logger.GetLogs(checkResult, cfg.MaxLogDays, default_config.GetLogPath())
 	if err != nil {
-		log.Fatalln("Error outputting results:", err)
+		log.Fatalln("Error outputting checkResult:", err)
 	}
 
-	// generate the report based on the results
-	if err := reporter.GenerateReport(logData, default_config.GetReportPath()); err != nil {
+	// generate the report based on the checkResult
+	if err := reporter.WriteReport(logResult, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())

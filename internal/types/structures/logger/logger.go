@@ -4,17 +4,17 @@ type (
 	// HistoryEntry represents a single history entry
 	HistoryEntry struct {
 		Time         string `json:"time"`
-		Status       string `json:"online"`
+		Status       string `json:"status"`
 		ResponseTime int    `json:"response_time,omitempty"`
 	}
 
-	History []HistoryEntry
-	Port    map[string]History
+	History   []HistoryEntry
+	Endpoints map[string]History
 
 	// Entry represents log data for a service
 	Entry struct {
-		ServiceHistory History `json:"service_history"`
-		PortsData      Port    `json:"ports"`
+		ServiceHistory History   `json:"service_history"`
+		Endpoints      Endpoints `json:"endpoints"`
 	}
 
 	// Logger represents the entire log structure
