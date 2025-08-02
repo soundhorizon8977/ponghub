@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-// NotifyResults sends notifications based on the service check results
-func NotifyResults(results []types.CheckResult) {
+// OutputResults sends notifications based on the service check results
+func OutputResults(results []types.CheckResult) {
 	// find all ports with status NONE
 	nonePorts := make(map[string][]string)
 	for _, result := range results {

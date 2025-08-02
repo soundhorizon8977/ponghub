@@ -85,7 +85,7 @@ func isSuccessfulResponse(cfg *types.PortConfig, resp *http.Response, body []byt
 
 // checkPort checks a single port based on the provided configuration
 func checkPort(cfg *types.PortConfig, timeout int, retryTimes int, svcName string) types.PortResult {
-	failures := []string{}
+	var failures []string
 	successCount := 0
 	actualAttempts := 0
 
@@ -184,7 +184,7 @@ func checkPort(cfg *types.PortConfig, timeout int, retryTimes int, svcName strin
 
 // CheckServices checks all services defined in the configuration
 func CheckServices(cfg *types.Config) []types.CheckResult {
-	results := []types.CheckResult{}
+	var results []types.CheckResult
 	for _, svc := range cfg.Services {
 		// start timer
 		svcStart := time.Now()
@@ -195,7 +195,7 @@ func CheckServices(cfg *types.Config) []types.CheckResult {
 		onlinePorts := 0
 
 		// check health ports
-		healthResults := []types.PortResult{}
+		var healthResults []types.PortResult
 		for _, h := range svc.Health {
 			pr := checkPort(&h, svc.Timeout, svc.Retry, svc.Name)
 			healthResults = append(healthResults, pr)
@@ -208,7 +208,7 @@ func CheckServices(cfg *types.Config) []types.CheckResult {
 		}
 
 		// check API ports
-		apiResults := []types.PortResult{}
+		var apiResults []types.PortResult
 		for _, a := range svc.API {
 			pr := checkPort(&a, svc.Timeout, svc.Retry, svc.Name)
 			apiResults = append(apiResults, pr)

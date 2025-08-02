@@ -18,7 +18,7 @@ func main() {
 
 	// check services based on the configuration
 	results := process.CheckServices(cfg)
-	notify.NotifyResults(results)
+	notify.OutputResults(results)
 	logData, err := process.OutputResults(results, cfg.MaxLogDays, default_config.GetLogPath())
 	if err != nil {
 		log.Fatalln("Error outputting results:", err)
