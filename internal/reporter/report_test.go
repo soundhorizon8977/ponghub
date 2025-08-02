@@ -1,7 +1,7 @@
-package report
+package reporter
 
 import (
-	"github.com/wcy-dt/ponghub/internal/process"
+	"github.com/wcy-dt/ponghub/internal/logger"
 	"os"
 	"path/filepath"
 	"testing"
@@ -12,7 +12,7 @@ func TestGenerateReport(t *testing.T) {
 	logPath := "data/ponghub_log.json"
 	outPath := "data/index.html"
 
-	logData, err := process.LoadExistingLog(logPath)
+	logData, err := logger.LoadExistingLog(logPath)
 	if err != nil {
 		t.Fatalf("Failed to load log data: %v", err)
 	}

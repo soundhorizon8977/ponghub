@@ -1,0 +1,30 @@
+package configure
+
+type (
+	// Service defines the configuration for a service, including its health and API ports
+	Service struct {
+		Name    string `yaml:"name"`
+		Health  []Port `yaml:"health"`
+		API     []Port `yaml:"api"`
+		Timeout int    `yaml:"timeout,omitempty"`
+		Retry   int    `yaml:"retry,omitempty"`
+	}
+
+	// Port defines the configuration for a port
+	Port struct {
+		URL           string            `yaml:"url"`
+		Method        string            `yaml:"method,omitempty"`
+		Headers       map[string]string `yaml:"headers,omitempty"`
+		Body          string            `yaml:"body,omitempty"`
+		StatusCode    int               `yaml:"status_code,omitempty"`
+		ResponseRegex string            `yaml:"response_regex,omitempty"`
+	}
+
+	// Configure defines the overall configuration structure for the application
+	Configure struct {
+		Services   []Service `yaml:"services"`
+		Timeout    int       `yaml:"timeout,omitempty"`
+		Retry      int       `yaml:"retry,omitempty"`
+		MaxLogDays int       `yaml:"max_log_days,omitempty"`
+	}
+)

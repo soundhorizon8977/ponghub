@@ -1,15 +1,15 @@
-package report
+package reporter
 
 import (
 	"fmt"
-	"github.com/wcy-dt/ponghub/internal/types"
-	"github.com/wcy-dt/ponghub/internal/types/default_config"
+	"github.com/wcy-dt/ponghub/internal/types/structures/logger"
+	"github.com/wcy-dt/ponghub/internal/types/types/default_config"
 	"html/template"
 	"os"
 )
 
 // getLatestTime retrieves the latest time from the log data
-func getLatestTime(logData types.LogData) string {
+func getLatestTime(logData logger.Logger) string {
 	var latestTime string
 
 	for _, svcData := range logData {
@@ -26,7 +26,7 @@ func getLatestTime(logData types.LogData) string {
 }
 
 // GenerateReport generates an HTML report from the provided log data
-func GenerateReport(logData types.LogData, outPath string) error {
+func GenerateReport(logData logger.Logger, outPath string) error {
 	reportEntries := logData.ParseToReportEntries()
 
 	tmpl, err := template.New("report.html").

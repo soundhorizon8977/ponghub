@@ -1,15 +1,15 @@
-package notify
+package notifier
 
 import (
-	"github.com/wcy-dt/ponghub/internal/types"
-	"github.com/wcy-dt/ponghub/internal/types/default_config"
-	"github.com/wcy-dt/ponghub/internal/types/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/structures/checker"
+	"github.com/wcy-dt/ponghub/internal/types/types/default_config"
+	"github.com/wcy-dt/ponghub/internal/types/types/test_result"
 	"log"
 	"os"
 )
 
-// OutputResults sends notifications based on the service check results
-func OutputResults(results []types.CheckResult) {
+// WriteNotifications sends notifications based on the service check results
+func WriteNotifications(results []checker.Checker) {
 	// find all ports with status NONE
 	nonePorts := make(map[string][]string)
 	for _, result := range results {

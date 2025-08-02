@@ -1,10 +1,10 @@
-package process
+package checker
 
 import (
 	"errors"
 	"fmt"
-	"github.com/wcy-dt/ponghub/internal/types"
-	"github.com/wcy-dt/ponghub/internal/types/test_result"
+	"github.com/wcy-dt/ponghub/internal/types/structures/checker"
+	"github.com/wcy-dt/ponghub/internal/types/structures/configure"
 	"io"
 	"log"
 	"net/http"
@@ -40,20 +40,8 @@ func getHttpMethod(method string) string {
 	return http.MethodGet
 }
 
-// getTestResult determines the test result based on the success count and actual attempts
-func getTestResult(successCount, actualAttempts int) test_result.TestResult {
-	switch successCount {
-	case actualAttempts:
-		return test_result.ALL
-	case 0:
-		return test_result.NONE
-	default:
-		return test_result.PART
-	}
-}
-
 // isSuccessfulResponse checks if the response from the server is successful based on the configuration
-func isSuccessfulResponse(cfg *types.PortConfig, resp *http.Response, body []byte) bool {
+func isSuccessfulResponse(cfg *configure.Port, resp *http.Response, body []byte) bool {
 	// responseRegex is set, and the response body does not match the regex
 	if cfg.ResponseRegex != "" {
 		matched, err := regexp.Match(cfg.ResponseRegex, body)
@@ -84,7 +72,7 @@ func isSuccessfulResponse(cfg *types.PortConfig, resp *http.Response, body []byt
 }
 
 // checkPort checks a single port based on the provided configuration
-func checkPort(cfg *types.PortConfig, timeout int, retryTimes int, svcName string) types.PortResult {
+func checkPort(cfg *configure.Port, timeout int, retryTimes int, svcName string) checker.Port {
 	var failures []string
 	successCount := 0
 	actualAttempts := 0
@@ -166,7 +154,7 @@ func checkPort(cfg *types.PortConfig, timeout int, retryTimes int, svcName strin
 	// end timer
 	end := time.Now()
 
-	return types.PortResult{
+	return checker.Port{
 		URL:           cfg.URL,
 		Method:        httpMethod,
 		Body:          cfg.Body,
@@ -180,60 +168,4 @@ func checkPort(cfg *types.PortConfig, timeout int, retryTimes int, svcName strin
 		Failures:      failures,
 		ResponseBody:  responseBody,
 	}
-}
-
-// CheckServices checks all services defined in the configuration
-func CheckServices(cfg *types.Config) []types.CheckResult {
-	var results []types.CheckResult
-	for _, svc := range cfg.Services {
-		// start timer
-		svcStart := time.Now()
-
-		totalAttempts := 0
-		successCount := 0
-		totalPorts := 0
-		onlinePorts := 0
-
-		// check health ports
-		var healthResults []types.PortResult
-		for _, h := range svc.Health {
-			pr := checkPort(&h, svc.Timeout, svc.Retry, svc.Name)
-			healthResults = append(healthResults, pr)
-			totalAttempts += pr.TotalAttempts
-			successCount += pr.SuccessCount
-			totalPorts++
-			if pr.Online == test_result.ALL {
-				onlinePorts++
-			}
-		}
-
-		// check API ports
-		var apiResults []types.PortResult
-		for _, a := range svc.API {
-			pr := checkPort(&a, svc.Timeout, svc.Retry, svc.Name)
-			apiResults = append(apiResults, pr)
-			totalAttempts += pr.TotalAttempts
-			successCount += pr.SuccessCount
-			totalPorts++
-			if pr.Online == test_result.ALL {
-				onlinePorts++
-			}
-		}
-
-		// end timer
-		svcEnd := time.Now()
-
-		res := types.CheckResult{
-			Name:          svc.Name,
-			Online:        getTestResult(onlinePorts, totalPorts),
-			Health:        healthResults,
-			API:           apiResults,
-			StartTime:     svcStart.Format(time.RFC3339),
-			EndTime:       svcEnd.Format(time.RFC3339),
-			TotalAttempts: totalAttempts,
-			SuccessCount:  successCount,
-		}
-		results = append(results, res)
-	}
-	return results
 }
