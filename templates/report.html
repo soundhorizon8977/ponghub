@@ -79,7 +79,7 @@
                         <span class="response-time-value response-time-red">-</span>
                     {{ else }}
                         <span class="response-time-value
-                            {{ if gt $last.ResponseTime 1000 }}response-time-red{{ else if le $last.ResponseTime 100 }}response-time-green{{ else }}response-time-yellow{{ end }}">
+                            {{ if gt $last.ResponseTime 500 }}response-time-red{{ else if le $last.ResponseTime 50 }}response-time-green{{ else }}response-time-yellow{{ end }}">
                             {{ $last.ResponseTime }} ms
                         </span>
                     {{ end }}
@@ -97,12 +97,12 @@
                     {{ range $i, $h := $arr }}
                         {{ if ge $i (sub $len 72) }}
                             <div class="status-rect status-{{ $h.Status }}" data-time="{{ $h.Time }}">
-                                {{ if or (not $h.ResponseTime) (ge $h.ResponseTime 1000) }}
+                                {{ if or (not $h.ResponseTime) (ge $h.ResponseTime 500) }}
                                     <div class="status-rect-content" style="height: 100%;"></div>
-                                {{ else if le $h.ResponseTime 100 }}
+                                {{ else if le $h.ResponseTime 50 }}
                                     <div class="status-rect-content" style="height: 10%;"></div>
                                 {{ else }}
-                                    <div class="status-rect-content" style="height: {{ div $h.ResponseTime 10 }}%;"></div>
+                                    <div class="status-rect-content" style="height: {{ div $h.ResponseTime 5 }}%;"></div>
                                 {{ end }}
                             </div>
                         {{ end }}
