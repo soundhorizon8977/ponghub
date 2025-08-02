@@ -31,13 +31,14 @@ func TestMain_append(t *testing.T) {
 	// check services based on the configuration
 	checkResult := checker.CheckServices(cfg)
 	notifier.WriteNotifications(checkResult)
-	logResult, err := logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
+	_, err = logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting checkResult:", err)
 	}
 
 	// generate the report based on the checkResult
-	if err := reporter.WriteReport(logResult, default_config.GetReportPath()); err != nil {
+	reportResult, err := reporter.GetReport(checkResult, tmpLogPath)
+	if err := reporter.WriteReport(reportResult, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())
@@ -60,13 +61,14 @@ func TestMain_new(t *testing.T) {
 	// check services based on the configuration
 	checkResult := checker.CheckServices(cfg)
 	notifier.WriteNotifications(checkResult)
-	logResult, err := logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
+	_, err = logger.GetLogs(checkResult, cfg.MaxLogDays, tmpLogPath)
 	if err != nil {
 		log.Fatalln("Error outputting checkResult:", err)
 	}
 
 	// generate the report based on the checkResult
-	if err := reporter.WriteReport(logResult, default_config.GetReportPath()); err != nil {
+	reportResult, err := reporter.GetReport(checkResult, tmpLogPath)
+	if err := reporter.WriteReport(reportResult, default_config.GetReportPath()); err != nil {
 		log.Fatalln("Error generating report:", err)
 	} else {
 		log.Println("Report generated at", default_config.GetReportPath())

@@ -9,14 +9,24 @@ type (
 		ResponseTime int
 	}
 
-	History   []HistoryEntry
-	Endpoints map[string]History
+	History []HistoryEntry
 
-	// Reporter represents the result of checking a service
-	Reporter struct {
-		Name           string
-		ServiceHistory History
-		Endpoints      Endpoints
-		Availability   float64
+	Endpoint struct {
+		EndpointHistory History
+		//IsHTTPS         bool
+		//IsSSLExpired    bool
+		//SSLRemainedDays int
 	}
+
+	Endpoints map[string]Endpoint
+
+	// Service represents the result of checking a service
+	Service struct {
+		ServiceHistory History
+		Availability   float64
+		Endpoints      Endpoints
+	}
+
+	// Reporter represents the result of checking services
+	Reporter map[string]Service
 )

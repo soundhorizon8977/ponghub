@@ -2,16 +2,49 @@ package reporter
 
 import (
 	"fmt"
-	"github.com/wcy-dt/ponghub/internal/types/structures/logger"
+	"github.com/wcy-dt/ponghub/internal/common"
+	"github.com/wcy-dt/ponghub/internal/types/structures/checker"
+	"github.com/wcy-dt/ponghub/internal/types/structures/reporter"
+	"github.com/wcy-dt/ponghub/internal/types/types/chk_result"
 	"github.com/wcy-dt/ponghub/internal/types/types/default_config"
 	"html/template"
+	"log"
 	"os"
 )
 
-// WriteReport generates an HTML report from the provided log data
-func WriteReport(logResult logger.Logger, reportPath string) error {
-	reportResult := logResult.ParseToReportEntries()
+// GetReport generates a report based on the check results and log data
+func GetReport(checkResult []checker.Checker, logPath string) (reporter.Reporter, error) {
+	logResult, err := common.ReadLogs(logPath)
+	if err != nil {
+		log.Printf("Error loading log data from %s: %v", logPath, err)
+		return nil, err
+	}
 
+	reportResult := reporter.ParseLogResult(logResult)
+
+	for serviceName, serviceLog := range logResult {
+		if len(serviceLog.ServiceHistory) == 0 {
+			continue
+		}
+
+		// calculate availability
+		statusAllEntryNum := 0
+		for _, entry := range serviceLog.ServiceHistory {
+			if chk_result.IsALL(entry.Status) {
+				statusAllEntryNum++
+			}
+		}
+		availability := float64(statusAllEntryNum) / float64(len(serviceLog.ServiceHistory))
+		tmp := reportResult[serviceName]
+		tmp.Availability = availability
+		reportResult[serviceName] = tmp
+	}
+
+	return reportResult, nil
+}
+
+// WriteReport generates an HTML report from the provided log data
+func WriteReport(reportResult reporter.Reporter, reportPath string) error {
 	tmpl, err := template.New("report.html").
 		Funcs(createTemplateFunc()).
 		ParseFiles(default_config.GetTemplatePath())
@@ -31,7 +64,7 @@ func WriteReport(logResult logger.Logger, reportPath string) error {
 
 	if err := tmpl.Execute(reportFile, map[string]any{
 		"ReportResult": reportResult,
-		"UpdateTime":   getLatestTime(logResult),
+		"UpdateTime":   getLatestTime(reportResult),
 	}); err != nil {
 		return fmt.Errorf("template execution failed: %w", err)
 	}
@@ -40,10 +73,10 @@ func WriteReport(logResult logger.Logger, reportPath string) error {
 }
 
 // getLatestTime retrieves the latest time from the log data
-func getLatestTime(logResult logger.Logger) string {
+func getLatestTime(reportResult reporter.Reporter) string {
 	var latestTime string
 
-	for _, serviceResult := range logResult {
+	for _, serviceResult := range reportResult {
 		for _, serviceHistoryEntry := range serviceResult.ServiceHistory {
 			if latestTime == "" {
 				latestTime = serviceHistoryEntry.Time

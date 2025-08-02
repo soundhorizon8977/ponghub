@@ -11,12 +11,12 @@ type (
 	History   []HistoryEntry
 	Endpoints map[string]History
 
-	// Entry represents log data for a service
-	Entry struct {
+	// Service represents log data for a service
+	Service struct {
 		ServiceHistory History   `json:"service_history"`
 		Endpoints      Endpoints `json:"endpoints"`
 	}
 
 	// Logger represents the entire log structure
-	Logger map[string]Entry
+	Logger map[string]Service
 )
