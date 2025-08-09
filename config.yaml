@@ -1,14 +1,22 @@
+timeout: 5
+max_retry_times: 2
+max_log_days: 3
+cert_notify_days: 7
 services:
-  - name: "My Pages"
+  - name: "GitHub API"
     endpoints:
-      - url: "https://blog.ch3nyang.top"
-      - url: "https://file.ch3nyang.top"
-      - url: "https://til.ch3nyang.top"
-      - url: "https://mind.ch3nyang.top"
-  - name: "My Services"
+      - url: "https://api.github.com"
+      - url: "https://api.github.com/repos/wcy-dt/ponghub"
+        method: "GET"
+        headers:
+          Content-Type: application/json
+          Authorization: Bearer your_token
+        status_code: 200
+        response_regex: "full_name"
+  - name: "Example Website"
     endpoints:
-      - url: "https://docker-registry.ch3nyang.top/health"
-      - url: "https://2024.ch3nyang.top/health"
-      - url: "https://docker-registry.ch3nyang.top/v2"
-        status_code: 401
-      - url: "https://2024.ch3nyang.top"
+      - url: "https://example.com/health"
+        response_regex: "status"
+      - url: "https://example.com/status"
+        method: "POST"
+        body: '{"key": "value"}'
